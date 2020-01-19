@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:provider_auth/ui/router.dart';
-import 'package:provider_auth/locator.dart';
+import 'package:infrastrucktor/ui/router.dart';
+import 'package:infrastrucktor/locator.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'provider_auth',
+      title: 'Infrastrucktor',
       theme:
           ThemeData(primaryColor: Colors.blue, accentColor: Colors.blueAccent),
       initialRoute: '/',

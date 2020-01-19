@@ -1,21 +1,20 @@
-import 'package:provider_auth/ui/shared/menuclipper.dart';
+import 'package:infrastrucktor/ui/shared/menuclipper.dart';
 import 'package:flutter/material.dart';
 
 buildDrawer(BuildContext context) {
   final String _img = "assets/logo.png";
-    return ClipPath(
-      clipper: MenuClipper(),
-      child: Container(
-          padding: EdgeInsets.only(left: 16.0, right: 40),
-          decoration: BoxDecoration(
-            color: Colors.blue[700],
-            boxShadow: [BoxShadow(color: Colors.black45)]
-          ),
-          width: 300.0,
-          height: double.maxFinite,
-          child: SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
+  return ClipPath(
+    clipper: MenuClipper(),
+    child: Container(
+      padding: EdgeInsets.only(left: 16.0, right: 40),
+      decoration: BoxDecoration(
+          color: Colors.blue[700],
+          boxShadow: [BoxShadow(color: Colors.black45)]),
+      width: 300.0,
+      height: double.maxFinite,
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
             children: <Widget>[
               Container(
                 alignment: Alignment.centerRight,
@@ -24,18 +23,17 @@ buildDrawer(BuildContext context) {
                     Icons.power_settings_new,
                     color: Colors.blue[200],
                   ),
-                  onPressed: () => Navigator.of(context).pushReplacementNamed('/auth'),
+                  onPressed: () =>
+                      Navigator.of(context).pushReplacementNamed('/auth'),
                 ),
               ),
               Container(
                 height: 90,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [Colors.blue[200], Colors.blue[700]]
-                  )
-                ),
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                        colors: [Colors.blue[200], Colors.blue[700]])),
                 child: CircleAvatar(
                   radius: 40,
                   backgroundImage: AssetImage(_img),
@@ -77,9 +75,9 @@ Divider _buildDivider() {
   return Divider(
     color: Colors.blue[200],
   );
-  }
+}
 
-  Widget _buildRow(IconData icon, String title) {
+Widget _buildRow(IconData icon, String title) {
   final TextStyle tStyle = TextStyle(color: Colors.blue[200], fontSize: 16.0);
 
   return FlatButton(

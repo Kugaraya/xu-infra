@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:provider_auth/core/viewmodels/counter.dart';
-import 'package:provider_auth/ui/widgets/menu.dart';
+import 'package:infrastrucktor/core/viewmodels/counter.dart';
+import 'package:infrastrucktor/ui/widgets/menu.dart';
 
 class HomeView extends StatefulWidget {
   @override
   _HomeViewState createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
+class _HomeViewState extends State<HomeView>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _searchCtrl = TextEditingController();
   bool _activeSearch = false;
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
   }
 
@@ -25,12 +26,15 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   @override
   bool get wantKeepAlive => true;
 
-  Widget _search(){
+  Widget _search() {
     return TextField(
       controller: _searchCtrl,
       autofocus: true,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(32.0), bottomLeft: Radius.circular(32.0))),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(32.0),
+                bottomLeft: Radius.circular(32.0))),
         prefixIcon: Icon(Icons.search, color: Colors.blueGrey),
         suffixIcon: IconButton(
           icon: Icon(Icons.cancel, color: Colors.black),
@@ -47,7 +51,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      key: _scaffoldKey,  
+      key: _scaffoldKey,
       drawer: buildDrawer(context),
       appBar: AppBar(
         title: Text("Home"),
@@ -56,18 +60,20 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
           onPressed: () => _scaffoldKey.currentState.openDrawer(),
         ),
         actions: <Widget>[
-          _activeSearch ? 
-          Container(
-            width: MediaQuery.of(context).size.width * 0.60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(32.0), bottomLeft: Radius.circular(32.0)),
-              color: Colors.white,
-            ),
-            child: _search()
-          ) : IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () => setState(() => _activeSearch = true),
-          )
+          _activeSearch
+              ? Container(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(32.0),
+                        bottomLeft: Radius.circular(32.0)),
+                    color: Colors.white,
+                  ),
+                  child: _search())
+              : IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () => setState(() => _activeSearch = true),
+                )
         ],
       ),
       body: CounterViewModel(),

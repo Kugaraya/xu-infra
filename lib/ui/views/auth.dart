@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider_auth/core/viewmodels/login.dart';
-import 'package:provider_auth/core/viewmodels/register.dart';
-import 'package:provider_auth/locator.dart';
+import 'package:infrastrucktor/core/viewmodels/login.dart';
+import 'package:infrastrucktor/core/viewmodels/register.dart';
+import 'package:infrastrucktor/locator.dart';
 
 class AuthView extends StatefulWidget {
-  AuthView({Key key}) : super(key : key);
+  AuthView({Key key}) : super(key: key);
   @override
   _AuthViewState createState() => _AuthViewState();
 }
 
-class _AuthViewState extends State<AuthView> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+class _AuthViewState extends State<AuthView>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   TabController _tabController;
   @override
   bool get wantKeepAlive => true;
@@ -32,29 +33,22 @@ class _AuthViewState extends State<AuthView> with SingleTickerProviderStateMixin
     super.build(context);
     return SafeArea(
       child: Scaffold(
-        appBar: TabBar(
-          controller: _tabController,
-          labelColor: Theme.of(context).accentColor,
-          indicatorColor: Theme.of(context).primaryColor,
-          tabs: <Widget>[
-            Tab(
-              icon: Icon(Icons.person_pin),
-              text: "Login",
-            ),
-            Tab(
-              icon: Icon(Icons.note_add),
-              text: "Register"
-            )
-          ],
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: <Widget>[
-            LoginViewModel(),
-            RegisterViewModel()
-          ],
-        )
-      ),
+          appBar: TabBar(
+            controller: _tabController,
+            labelColor: Theme.of(context).accentColor,
+            indicatorColor: Theme.of(context).primaryColor,
+            tabs: <Widget>[
+              Tab(
+                icon: Icon(Icons.person_pin),
+                text: "Login",
+              ),
+              Tab(icon: Icon(Icons.note_add), text: "Register")
+            ],
+          ),
+          body: TabBarView(
+            controller: _tabController,
+            children: <Widget>[LoginViewModel(), RegisterViewModel()],
+          )),
     );
   }
 }
