@@ -1,95 +1,177 @@
-import 'package:infrastrucktor/ui/shared/menuclipper.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:infrastrucktor/core/models/admin-administrators.dart';
+import 'package:infrastrucktor/core/models/admin-contractors.dart';
+import 'package:infrastrucktor/core/services/auth-service.dart';
+import 'package:infrastrucktor/core/viewmodels/profile.dart';
+import 'package:infrastrucktor/ui/views/main-page.dart';
+import 'package:infrastrucktor/ui/widgets/menuclipper.dart';
 import 'package:flutter/material.dart';
 
-buildDrawer(BuildContext context) {
-  final String _img = "assets/logo.png";
-  return ClipPath(
-    clipper: MenuClipper(),
-    child: Container(
-      padding: EdgeInsets.only(left: 16.0, right: 40),
-      decoration: BoxDecoration(
-          color: Colors.blue[700],
-          boxShadow: [BoxShadow(color: Colors.black45)]),
-      width: 300.0,
-      height: double.maxFinite,
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Container(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.power_settings_new,
-                    color: Colors.blue[200],
+class Menu {
+  Menu(this.db, this.fs, this.userEmail, this.userId, this.auth,
+      this.logoutCallback, this.context);
+
+  final Firestore db;
+  final FirebaseStorage fs;
+  final String userEmail;
+  final String userId;
+  final BaseAuth auth;
+  final VoidCallback logoutCallback;
+  final BuildContext context;
+
+  adminDrawer() {
+    final String _img = "assets/logo.png";
+    return ClipPath(
+      clipper: MenuClipper(),
+      child: Container(
+        padding: EdgeInsets.only(left: 16.0, right: 40),
+        decoration: BoxDecoration(
+            color: Colors.teal[700],
+            boxShadow: [BoxShadow(color: Colors.black45)]),
+        width: 300.0,
+        height: MediaQuery.of(context).size.height,
+        child: SafeArea(
+          child: StreamBuilder(
+              stream: db
+                  .collection("accounts")
+                  .where("uid", isEqualTo: userId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData ||
+                    snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                DocumentSnapshot data = snapshot.data.documents[0];
+
+                return SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 40.0,
+                      ),
+                      Container(
+                        height: 90,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                                colors: [Colors.teal[200], Colors.teal[700]])),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.teal[200],
+                          radius: 40,
+                          backgroundImage: AssetImage(_img),
+                        ),
+                      ),
+                      SizedBox(height: 5.0),
+                      Text(
+                        data["firstname"] +
+                            " " +
+                            data["middlename"] +
+                            " " +
+                            data["lastname"],
+                        style: TextStyle(color: Colors.white, fontSize: 18.0),
+                      ),
+                      Text(
+                        data["email"],
+                        style:
+                            TextStyle(color: Colors.teal[200], fontSize: 16.0),
+                      ),
+                      SizedBox(height: 50.0),
+                      _buildRow(
+                          Icons.home,
+                          "Dashboard",
+                          DashboardMain(
+                            auth: auth,
+                            db: db,
+                            fs: fs,
+                            userId: userId,
+                            userEmail: userEmail,
+                            logoutCallback: logoutCallback,
+                          )),
+                      _buildDivider(),
+                      _buildRow(
+                          Icons.person_pin,
+                          "Profile",
+                          AccountProfile(
+                            auth: auth,
+                            db: db,
+                            fs: fs,
+                            userId: userId,
+                            userEmail: userEmail,
+                            logoutCallback: logoutCallback,
+                            document: data,
+                          )),
+                      _buildDivider(),
+                      _buildRow(
+                          Icons.people,
+                          "Contractors",
+                          AdminContractors(
+                            auth: auth,
+                            db: db,
+                            fs: fs,
+                            userId: userId,
+                            userEmail: userEmail,
+                            logoutCallback: logoutCallback,
+                          )),
+                      _buildDivider(),
+                      _buildRow(
+                          Icons.supervised_user_circle,
+                          "Administrators",
+                          AdminAdministrators(
+                            auth: auth,
+                            db: db,
+                            fs: fs,
+                            userId: userId,
+                            userEmail: userEmail,
+                            logoutCallback: logoutCallback,
+                          )),
+                      _buildDivider(),
+                      FlatButton(
+                        onPressed: logoutCallback,
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(children: [
+                          Icon(Icons.exit_to_app, color: Colors.teal[200]),
+                          SizedBox(width: 10.0),
+                          Text(
+                            "Logout",
+                            style: TextStyle(
+                                color: Colors.teal[200], fontSize: 16.0),
+                          ),
+                        ]),
+                      )
+                    ],
                   ),
-                  onPressed: () =>
-                      Navigator.of(context).pushReplacementNamed('/auth'),
-                ),
-              ),
-              Container(
-                height: 90,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                        colors: [Colors.blue[200], Colors.blue[700]])),
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage(_img),
-                ),
-              ),
-              SizedBox(height: 5.0),
-              Text(
-                "Kim Testa",
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
-              ),
-              Text(
-                "kim.testa@curiouslab.sg",
-                style: TextStyle(color: Colors.blue[200], fontSize: 16.0),
-              ),
-              Text(
-                "Admin",
-                style: TextStyle(color: Colors.white, fontSize: 12.0),
-              ),
-              SizedBox(height: 30.0),
-              _buildRow(Icons.home, "Home"),
-              _buildDivider(),
-              _buildRow(Icons.person_pin, "Your profile"),
-              _buildDivider(),
-              _buildRow(Icons.settings, "Settings"),
-              _buildDivider(),
-              _buildRow(Icons.email, "Contact us"),
-              _buildDivider(),
-              _buildRow(Icons.help, "Help"),
-              _buildDivider(),
-            ],
-          ),
+                );
+              }),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Divider _buildDivider() {
-  return Divider(
-    color: Colors.blue[200],
-  );
-}
+  Divider _buildDivider() {
+    return Divider(
+      color: Colors.teal[200],
+    );
+  }
 
-Widget _buildRow(IconData icon, String title) {
-  final TextStyle tStyle = TextStyle(color: Colors.blue[200], fontSize: 16.0);
+  Widget _buildRow(IconData icon, String title, Object page) {
+    final TextStyle tStyle = TextStyle(color: Colors.teal[200], fontSize: 16.0);
 
-  return FlatButton(
-    onPressed: () {},
-    padding: EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(children: [
-      Icon(icon, color: Colors.blue[200]),
-      SizedBox(width: 10.0),
-      Text(
-        title,
-        style: tStyle,
-      ),
-    ]),
-  );
+    return FlatButton(
+      onPressed: () {
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (context) => page));
+      },
+      padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(children: [
+        Icon(icon, color: Colors.teal[200]),
+        SizedBox(width: 10.0),
+        Text(
+          title,
+          style: tStyle,
+        ),
+      ]),
+    );
+  }
 }

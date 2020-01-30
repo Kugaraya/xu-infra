@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:infrastrucktor/ui/views/auth.dart';
-import 'package:infrastrucktor/ui/views/home.dart';
+import 'package:infrastrucktor/ui/views/dashboard.dart';
+import 'package:infrastrucktor/ui/views/main-page.dart';
 import 'package:infrastrucktor/ui/views/splash.dart';
 
 class Router {
@@ -8,10 +8,10 @@ class Router {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) => SplashView());
-      case '/auth':
-        return MaterialPageRoute(builder: (_) => AuthView());
-      case '/home':
-        return MaterialPageRoute(builder: (_) => HomeView());
+      case '/main':
+        return MaterialPageRoute(builder: (_) => DashboardMain());
+      case '/dashboard':
+        return MaterialPageRoute(builder: (_) => DashboardScreen());
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(

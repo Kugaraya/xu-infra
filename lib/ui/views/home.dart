@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:infrastrucktor/core/viewmodels/counter.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
 class HomeView extends StatefulWidget {
@@ -9,6 +8,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  Menu _menu;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _searchCtrl = TextEditingController();
   bool _activeSearch = false;
@@ -52,7 +52,7 @@ class _HomeViewState extends State<HomeView>
     super.build(context);
     return Scaffold(
       key: _scaffoldKey,
-      drawer: buildDrawer(context),
+      drawer: _menu.adminDrawer(),
       appBar: AppBar(
         title: Text("Home"),
         leading: IconButton(
@@ -76,7 +76,7 @@ class _HomeViewState extends State<HomeView>
                 )
         ],
       ),
-      body: CounterViewModel(),
+      body: Container(),
     );
   }
 }
