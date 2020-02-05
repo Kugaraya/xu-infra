@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:infrastrucktor/core/models/manage-admin.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:infrastrucktor/core/viewmodels/profile.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
@@ -81,7 +82,14 @@ class _AdminAdministratorsState extends State<AdminAdministrators> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => ManageAdmin(
+                    auth: widget.auth,
+                    db: widget.db,
+                    fs: widget.fs,
+                  )));
+        },
         child: Icon(
           Icons.add,
           color: Colors.white,
@@ -113,9 +121,10 @@ class _AdminAdministratorsState extends State<AdminAdministrators> {
                           data[i]['lastname'].contains(_searchCtrl.text)) {
                         return Container(
                           height: 100.0,
-                          color: Colors.blueGrey,
-                          child: Center(
-                            child: ListTile(
+                          child: Card(
+                            elevation: 5.0,
+                            child: InkWell(
+                              splashColor: Theme.of(context).primaryColor,
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => AccountProfile(
@@ -128,25 +137,28 @@ class _AdminAdministratorsState extends State<AdminAdministrators> {
                                           document: data[i],
                                         )));
                               },
-                              leading: Container(
-                                child: Image.asset("assets/logo.png"),
-                              ),
-                              trailing: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.chevron_right,
-                                  color: Colors.white,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 18.0),
+                                child: ListTile(
+                                  leading: Container(
+                                    child: Image.asset("assets/logo.png"),
+                                  ),
+                                  trailing: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.chevron_right,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    data[i]["firstname"] +
+                                        " " +
+                                        data[i]["middlename"] +
+                                        " " +
+                                        data[i]["lastname"],
+                                    textScaleFactor: 1.5,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                              ),
-                              title: Text(
-                                data[i]["firstname"] +
-                                    " " +
-                                    data[i]["middlename"] +
-                                    " " +
-                                    data[i]["lastname"],
-                                style: TextStyle(color: Colors.white),
-                                textScaleFactor: 1.5,
-                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
@@ -155,9 +167,10 @@ class _AdminAdministratorsState extends State<AdminAdministrators> {
                     } else {
                       return Container(
                         height: 100.0,
-                        color: Colors.blueGrey,
-                        child: Center(
-                          child: ListTile(
+                        child: Card(
+                          elevation: 5.0,
+                          child: InkWell(
+                            splashColor: Theme.of(context).primaryColor,
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => AccountProfile(
@@ -170,25 +183,28 @@ class _AdminAdministratorsState extends State<AdminAdministrators> {
                                         document: data[i],
                                       )));
                             },
-                            leading: Container(
-                              child: Image.asset("assets/logo.png"),
-                            ),
-                            trailing: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.chevron_right,
-                                color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 18.0),
+                              child: ListTile(
+                                leading: Container(
+                                  child: Image.asset("assets/logo.png"),
+                                ),
+                                trailing: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.chevron_right,
+                                  ),
+                                ),
+                                title: Text(
+                                  data[i]["firstname"] +
+                                      " " +
+                                      data[i]["middlename"] +
+                                      " " +
+                                      data[i]["lastname"],
+                                  textScaleFactor: 1.5,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                            title: Text(
-                              data[i]["firstname"] +
-                                  " " +
-                                  data[i]["middlename"] +
-                                  " " +
-                                  data[i]["lastname"],
-                              style: TextStyle(color: Colors.white),
-                              textScaleFactor: 1.5,
-                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),

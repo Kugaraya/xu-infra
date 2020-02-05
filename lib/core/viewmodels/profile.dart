@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
+import 'package:infrastrucktor/core/viewmodels/update-profile.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
 class AccountProfile extends StatefulWidget {
@@ -34,24 +36,68 @@ class _AccountProfileState extends State<AccountProfile> {
     final _scaffoldKey = GlobalKey<ScaffoldState>();
     final _menu = Menu(widget.db, widget.fs, widget.userEmail, widget.userId,
         widget.auth, widget.logoutCallback, context);
-    return Scaffold(
-        key: _scaffoldKey,
-        drawer: Navigator.of(context).canPop() ? null : _menu.adminDrawer(),
-        body: StreamBuilder(
-            stream: widget.db
-                .collection("accounts")
-                .where("uid", isEqualTo: widget.document["uid"])
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData ||
-                  snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
-              DocumentSnapshot data = snapshot.data.documents[0];
-              return CustomScrollView(
+    return StreamBuilder(
+        stream: widget.db
+            .collection("accounts")
+            .where("uid", isEqualTo: widget.document["uid"])
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData ||
+              snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          DocumentSnapshot data = snapshot.data.documents[0];
+          return Scaffold(
+              key: _scaffoldKey,
+              drawer: Navigator.of(context).canPop()
+                  ? null
+                  : data["permission"] == 0
+                      ? _menu.adminDrawer()
+                      : _menu.contractorDrawer(),
+              // TODO : Multiple drawer
+              floatingActionButton:
+                  Navigator.of(context).canPop() && data["permission"] == 1
+                      ? FloatingActionButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => UpdateProfile(
+                                      auth: widget.auth,
+                                      db: widget.db,
+                                      document: data,
+                                      fs: widget.fs,
+                                      logoutCallback: widget.logoutCallback,
+                                      userEmail: widget.userEmail,
+                                      userId: widget.userId,
+                                    )));
+                          },
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                        )
+                      : !Navigator.of(context).canPop()
+                          ? FloatingActionButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => UpdateProfile(
+                                          auth: widget.auth,
+                                          db: widget.db,
+                                          document: data,
+                                          fs: widget.fs,
+                                          logoutCallback: widget.logoutCallback,
+                                          userEmail: widget.userEmail,
+                                          userId: widget.userId,
+                                        )));
+                              },
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                            )
+                          : null,
+              body: CustomScrollView(
                 slivers: <Widget>[
                   SliverAppBar(
-                    // TODO : multiple drawers
                     leading: Navigator.of(context).canPop()
                         ? null
                         : IconButton(
@@ -77,7 +123,21 @@ class _AccountProfileState extends State<AccountProfile> {
                         "assets/cover.png",
                         fit: BoxFit.cover,
                       ),
-                      title: Text("Profile"),
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(data["prefix"] +
+                              " " +
+                              data["firstname"] +
+                              " " +
+                              data["middlename"] +
+                              " " +
+                              data["lastname"]),
+                          Text(data["suffix"].isNotEmpty
+                              ? ", " + data["suffix"]
+                              : ""),
+                        ],
+                      ),
                       centerTitle: true,
                     ),
                   ),
@@ -86,13 +146,7 @@ class _AccountProfileState extends State<AccountProfile> {
                       children: <Widget>[
                         SizedBox(height: 30.0),
                         Text(
-                          data["firstname"] +
-                              " " +
-                              data["middlename"] +
-                              " " +
-                              data["lastname"] +
-                              " " +
-                              data["suffix"],
+                          "Profile Info",
                           style: TextStyle(fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                           textScaleFactor: 1.5,
@@ -118,7 +172,9 @@ class _AccountProfileState extends State<AccountProfile> {
                         ),
                         ListTile(
                           leading: Icon(MaterialIcons.phone),
-                          title: Text(data["contact"].toString()),
+                          title: Text(data["contact"].toString().isNotEmpty
+                              ? "+63" + data["contact"].toString()
+                              : ""),
                         ),
                         ListTile(
                           leading: Icon(MaterialIcons.person),
@@ -191,6 +247,9 @@ class _AccountProfileState extends State<AccountProfile> {
                                 color: Colors.black45,
                               ),
                               ListTile(
+                                onTap: () {
+                                  Fluttertoast.showToast(msg: "Testing");
+                                },
                                 leading: CircleAvatar(
                                   backgroundColor: Colors.teal,
                                   child: Text("3"),
@@ -206,6 +265,16 @@ class _AccountProfileState extends State<AccountProfile> {
                               SizedBox(
                                 height: 50.0,
                               ),
+                            ],
+                          ),
+                        )
+                      : SliverToBoxAdapter(
+                          child: Container(),
+                        ),
+                  Navigator.of(context).canPop() && data["permission"] == 1
+                      ? SliverToBoxAdapter(
+                          child: Column(
+                            children: <Widget>[
                               InkWell(
                                 splashColor: Theme.of(context).primaryColor,
                                 onTap: () {},
@@ -234,9 +303,9 @@ class _AccountProfileState extends State<AccountProfile> {
                         )
                       : SliverToBoxAdapter(
                           child: Container(),
-                        ),
+                        )
                 ],
-              );
-            }));
+              ));
+        });
   }
 }

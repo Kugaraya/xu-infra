@@ -8,7 +8,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="provider_auth"
+        android:label="Infrastrucktor"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBqyM3znR4wnnOcnjF_wG65nPBFx1B-O4M"/>

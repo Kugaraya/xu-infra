@@ -2,12 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:infrastrucktor/core/models/admin-contractors.dart';
+import 'package:infrastrucktor/core/models/contractor-projects.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 
-class AdminDashboard extends StatefulWidget {
-  AdminDashboard(
+class ContractorDashboard extends StatefulWidget {
+  ContractorDashboard(
       {Key key,
       this.userEmail,
       this.userId,
@@ -24,10 +23,10 @@ class AdminDashboard extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
   @override
-  _AdminDashboardState createState() => _AdminDashboardState();
+  _ContractorDashboardState createState() => _ContractorDashboardState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class _ContractorDashboardState extends State<ContractorDashboard> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -68,35 +67,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   SizedBox(
                     height: 20.0,
                   ),
-                  Slidable(
-                    actionPane: SlidableDrawerActionPane(),
-                    actionExtentRatio: 0.25,
-                    child: Container(
-                      height: 100.0,
-                      child: Card(
-                        elevation: 5.0,
+                  Container(
+                    height: 100.0,
+                    child: Card(
+                      elevation: 5.0,
+                      child: InkWell(
+                        onTap: () {
+                          ContractorProjects(
+                            auth: widget.auth,
+                            db: widget.db,
+                            fs: widget.fs,
+                            userEmail: widget.userEmail,
+                            userId: widget.userId,
+                          );
+                        },
+                        splashColor: Theme.of(context).primaryColor,
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12.0),
+                          padding: EdgeInsets.all(12.0),
                           child: ListTile(
-                            leading: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.chevron_left,
-                              ),
-                            ),
-                            trailing: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.chevron_right,
-                              ),
-                            ),
                             title: Text(
-                              'View',
+                              'View Projects',
                               textScaleFactor: 1.6,
                               textAlign: TextAlign.center,
                             ),
                             subtitle: Text(
-                              'Swipe left/right',
+                              'Tap here',
                               textScaleFactor: 1.2,
                               textAlign: TextAlign.center,
                             ),
@@ -104,36 +99,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       ),
                     ),
-                    actions: <Widget>[
-                      IconSlideAction(
-                        caption: 'Projects',
-                        color: Colors.blue,
-                        icon: Icons.search,
-                        onTap: () {},
-                      ),
-                    ],
-                    secondaryActions: <Widget>[
-                      IconSlideAction(
-                        caption: 'Contractors',
-                        color: Colors.red,
-                        icon: Icons.people,
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => AdminContractors(
-                                    auth: widget.auth,
-                                    db: widget.db,
-                                    fs: widget.fs,
-                                    userId: widget.userId,
-                                    userEmail: widget.userEmail,
-                                    logoutCallback: widget.logoutCallback,
-                                  )));
-                        },
-                      ),
-                    ],
                   ),
                   SizedBox(
                     height: 50.0,
                   ),
+                  // TODO : Project Status
                   Text(
                     "Project Status",
                     textAlign: TextAlign.center,

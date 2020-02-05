@@ -3,11 +3,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:infrastrucktor/core/models/manage-contractors.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
+import 'package:infrastrucktor/core/viewmodels/add-project.dart';
 import 'package:infrastrucktor/core/viewmodels/profile.dart';
+import 'package:infrastrucktor/core/viewmodels/project.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
-class AdminContractors extends StatefulWidget {
-  AdminContractors(
+class ContractorProjects extends StatefulWidget {
+  ContractorProjects(
       {Key key,
       this.userEmail,
       this.userId,
@@ -24,10 +26,10 @@ class AdminContractors extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
   @override
-  _AdminContractorsState createState() => _AdminContractorsState();
+  _ContractorProjects createState() => _ContractorProjects();
 }
 
-class _AdminContractorsState extends State<AdminContractors> {
+class _ContractorProjects extends State<ContractorProjects> {
   TextEditingController _searchCtrl = TextEditingController();
   bool _activeSearch = false;
 
@@ -61,9 +63,9 @@ class _AdminContractorsState extends State<AdminContractors> {
     final _menu = Menu(widget.db, widget.fs, widget.userEmail, widget.userId,
         widget.auth, widget.logoutCallback, context);
     return Scaffold(
-      drawer: Navigator.of(context).canPop() ? null : _menu.adminDrawer(),
+      drawer: Navigator.of(context).canPop() ? null : _menu.contractorDrawer(),
       appBar: AppBar(
-        title: Text("Contractors"),
+        title: Text("Projects"),
         actions: <Widget>[
           _activeSearch
               ? Container(
@@ -84,10 +86,11 @@ class _AdminContractorsState extends State<AdminContractors> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => ManageContractors(
+              builder: (context) => AddProject(
                     auth: widget.auth,
                     db: widget.db,
-                    fs: widget.fs,
+                    userEmail: widget.userEmail,
+                    userId: widget.userId,
                   )));
         },
         child: Icon(
@@ -100,10 +103,7 @@ class _AdminContractorsState extends State<AdminContractors> {
         child: SingleChildScrollView(
           child: Column(children: <Widget>[
             StreamBuilder(
-              stream: widget.db
-                  .collection("accounts")
-                  .where("permission", isEqualTo: 1)
-                  .snapshots(),
+              stream: widget.db.collection("projects").snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData ||
                     snapshot.connectionState == ConnectionState.waiting) {
@@ -117,12 +117,8 @@ class _AdminContractorsState extends State<AdminContractors> {
                         itemCount: data.length,
                         itemBuilder: (context, i) {
                           if (_searchCtrl.text.isNotEmpty) {
-                            if (data[i]['firstname']
-                                    .contains(_searchCtrl.text) ||
-                                data[i]['middlename']
-                                    .contains(_searchCtrl.text) ||
-                                data[i]['lastname']
-                                    .contains(_searchCtrl.text)) {
+                            if (data[i]['name'].contains(_searchCtrl.text) ||
+                                data[i]['id'].contains(_searchCtrl.text)) {
                               return Container(
                                 height: 100.0,
                                 child: Card(
@@ -130,23 +126,19 @@ class _AdminContractorsState extends State<AdminContractors> {
                                   child: InkWell(
                                     splashColor: Theme.of(context).primaryColor,
                                     onTap: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AccountProfile(
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) => ProjectView(
                                                     auth: widget.auth,
                                                     db: widget.db,
-                                                    fs: widget.fs,
-                                                    logoutCallback:
-                                                        widget.logoutCallback,
-                                                    userEmail: widget.userEmail,
-                                                    userId: data[i]["uid"],
                                                     document: data[i],
+                                                    userEmail: widget.userEmail,
+                                                    userId: widget.userId,
                                                   )));
                                     },
                                     child: Padding(
                                       padding:
-                                          EdgeInsets.symmetric(vertical: 18.0),
+                                          EdgeInsets.symmetric(vertical: 14.0),
                                       child: ListTile(
                                         leading: Container(
                                           child: Image.asset("assets/logo.png"),
@@ -158,14 +150,13 @@ class _AdminContractorsState extends State<AdminContractors> {
                                           ),
                                         ),
                                         title: Text(
-                                          data[i]["firstname"] +
-                                              " " +
-                                              data[i]["middlename"] +
-                                              " " +
-                                              data[i]["lastname"],
+                                          data[i]["name"],
                                           textScaleFactor: 1.5,
-                                          textAlign: TextAlign.center,
                                         ),
+                                        subtitle: data[i]["id"].isNotEmpty
+                                            ? Text(
+                                                "Project ID: " + data[i]["id"])
+                                            : null,
                                       ),
                                     ),
                                   ),
@@ -180,23 +171,19 @@ class _AdminContractorsState extends State<AdminContractors> {
                                 child: InkWell(
                                   splashColor: Theme.of(context).primaryColor,
                                   onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AccountProfile(
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => ProjectView(
                                                   auth: widget.auth,
                                                   db: widget.db,
-                                                  fs: widget.fs,
-                                                  logoutCallback:
-                                                      widget.logoutCallback,
-                                                  userEmail: widget.userEmail,
-                                                  userId: data[i]["uid"],
                                                   document: data[i],
+                                                  userEmail: widget.userEmail,
+                                                  userId: widget.userId,
                                                 )));
                                   },
                                   child: Padding(
                                     padding:
-                                        EdgeInsets.symmetric(vertical: 18.0),
+                                        EdgeInsets.symmetric(vertical: 14.0),
                                     child: ListTile(
                                       leading: Container(
                                         child: Image.asset("assets/logo.png"),
@@ -208,14 +195,12 @@ class _AdminContractorsState extends State<AdminContractors> {
                                         ),
                                       ),
                                       title: Text(
-                                        data[i]["firstname"] +
-                                            " " +
-                                            data[i]["middlename"] +
-                                            " " +
-                                            data[i]["lastname"],
+                                        data[i]["name"],
                                         textScaleFactor: 1.5,
-                                        textAlign: TextAlign.center,
                                       ),
+                                      subtitle: data[i]["id"].isNotEmpty
+                                          ? Text("Project ID: " + data[i]["id"])
+                                          : null,
                                     ),
                                   ),
                                 ),
@@ -236,7 +221,7 @@ class _AdminContractorsState extends State<AdminContractors> {
                             height: 10.0,
                           ),
                           Text(
-                            "There are no registered contractors,",
+                            "There are no registered projects,",
                             textAlign: TextAlign.center,
                             textScaleFactor: 1.1,
                           ),
@@ -244,7 +229,7 @@ class _AdminContractorsState extends State<AdminContractors> {
                             height: 5,
                           ),
                           Text(
-                            "Register a contractor by pressing the button below",
+                            "Add a project by pressing the button below",
                             textAlign: TextAlign.center,
                             textScaleFactor: 1.1,
                           ),

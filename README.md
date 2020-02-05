@@ -9,6 +9,7 @@ An MVVM based Project Tracker application developed in Dart using Flutter framew
 - [provider](https://pub.dev/packages/provider) ^4.0.1
 - [get_it](https://pub.dev/packages/get_it) ^1.0.3
 - [date_format](https://pub.dev/packages/date_format) ^1.0.8
+- [avatar_glow](https://pub.dev/packages/avatar_glow) ^1.1.0
 - [sliding_up_panel](https://pub.dev/packages/sliding_up_panel) ^0.3.6
 - [google_maps_flutter](https://pub.dev/packages/google_maps_flutter) ^0.5.21+15
 - [google_map_location_picker](https://pub.dev/packages/google_map_location_picker) ^3.1.0

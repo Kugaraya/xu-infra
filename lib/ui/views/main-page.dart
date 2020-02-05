@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:infrastrucktor/core/viewmodels/admin.dart';
+import 'package:infrastrucktor/core/viewmodels/contractor.dart';
 
 class DashboardMain extends StatefulWidget {
   DashboardMain(
@@ -52,8 +53,22 @@ class _DashboardMainState extends State<DashboardMain> {
                 userId: widget.userId,
                 logoutCallback: widget.logoutCallback,
               );
+
+            case 1:
+              return ContractorViewModel(
+                db: widget.db,
+                fs: widget.fs,
+                auth: widget.auth,
+                userEmail: widget.userEmail,
+                userId: widget.userId,
+                logoutCallback: widget.logoutCallback,
+              );
             default:
-              return Center(child: Text("Account invalid"));
+              return Center(
+                  child: Text(
+                "Account invalid",
+                textScaleFactor: 1.4,
+              ));
           }
         },
       );
