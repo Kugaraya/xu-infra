@@ -140,7 +140,7 @@ class _AdminContractorsState extends State<AdminContractors> {
                                                     logoutCallback:
                                                         widget.logoutCallback,
                                                     userEmail: widget.userEmail,
-                                                    userId: data[i]["uid"],
+                                                    userId: widget.userId,
                                                     document: data[i],
                                                   )));
                                     },
@@ -190,7 +190,7 @@ class _AdminContractorsState extends State<AdminContractors> {
                                                   logoutCallback:
                                                       widget.logoutCallback,
                                                   userEmail: widget.userEmail,
-                                                  userId: data[i]["uid"],
+                                                  userId: widget.userId,
                                                   document: data[i],
                                                 )));
                                   },

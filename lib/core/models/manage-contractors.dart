@@ -1,5 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_fluid_slider/flutter_fluid_slider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -67,10 +68,11 @@ class _AuthPageState extends State<ManageContractors> {
             "suffix": _suffix,
             "uid": userId,
           });
-          print('Signed up user: $userId');
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content: Text("Account registration success"),
-          ));
+
+          Fluttertoast.showToast(
+              msg: "Contractor registration success",
+              backgroundColor: Colors.black54,
+              textColor: Colors.white);
         }
         setState(() {
           _isLoading = false;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:infrastrucktor/core/viewmodels/admin.dart';
 import 'package:infrastrucktor/core/viewmodels/contractor.dart';
+import 'package:infrastrucktor/core/viewmodels/public.dart';
 
 class DashboardMain extends StatefulWidget {
   DashboardMain(
@@ -42,7 +43,6 @@ class _DashboardMainState extends State<DashboardMain> {
             return Center(child: CircularProgressIndicator());
           }
           int checker = snapshot.data.documents[0]["permission"];
-          print(checker);
           switch (checker) {
             case 0:
               return AdminViewModel(
@@ -56,6 +56,16 @@ class _DashboardMainState extends State<DashboardMain> {
 
             case 1:
               return ContractorViewModel(
+                db: widget.db,
+                fs: widget.fs,
+                auth: widget.auth,
+                userEmail: widget.userEmail,
+                userId: widget.userId,
+                logoutCallback: widget.logoutCallback,
+              );
+
+            case 2:
+              return PublicViewModel(
                 db: widget.db,
                 fs: widget.fs,
                 auth: widget.auth,

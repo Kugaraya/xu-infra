@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:infrastrucktor/core/models/admin-project.dart';
+import 'package:infrastrucktor/core/models/public-project.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
-import 'package:infrastrucktor/core/viewmodels/add-project.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
-class AdminProjects extends StatefulWidget {
-  AdminProjects(
+class PublicProjects extends StatefulWidget {
+  PublicProjects(
       {Key key,
       this.userEmail,
       this.userId,
@@ -24,10 +23,10 @@ class AdminProjects extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
   @override
-  _AdminProjectsState createState() => _AdminProjectsState();
+  _PublicProjectsState createState() => _PublicProjectsState();
 }
 
-class _AdminProjectsState extends State<AdminProjects> {
+class _PublicProjectsState extends State<PublicProjects> {
   TextEditingController _searchCtrl = TextEditingController();
   bool _activeSearch = false;
 
@@ -61,7 +60,7 @@ class _AdminProjectsState extends State<AdminProjects> {
     final _menu = Menu(widget.db, widget.fs, widget.userEmail, widget.userId,
         widget.auth, widget.logoutCallback, context);
     return Scaffold(
-      drawer: Navigator.of(context).canPop() ? null : _menu.contractorDrawer(),
+      drawer: Navigator.of(context).canPop() ? null : _menu.publicDrawer(),
       appBar: AppBar(
         title: Text("Projects"),
         actions: <Widget>[
@@ -112,7 +111,7 @@ class _AdminProjectsState extends State<AdminProjects> {
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  AdminProjectView(
+                                                  PublicProjectView(
                                                     auth: widget.auth,
                                                     db: widget.db,
                                                     document: data[i],
@@ -158,7 +157,7 @@ class _AdminProjectsState extends State<AdminProjects> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                AdminProjectView(
+                                                PublicProjectView(
                                                   auth: widget.auth,
                                                   db: widget.db,
                                                   document: data[i],

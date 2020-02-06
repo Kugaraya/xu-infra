@@ -346,7 +346,7 @@ class _AddProjectState extends State<AddProject> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Add Class'),
+        title: Text('Add Project'),
       ),
       body: Builder(builder: (context) {
         print(_pickedLocation);

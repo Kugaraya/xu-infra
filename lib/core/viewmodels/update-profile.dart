@@ -193,7 +193,7 @@ class _AccountProfileState extends State<UpdateProfile> {
                                   padding: const EdgeInsets.fromLTRB(
                                       0.0, 15.0, 0.0, 0.0),
                                   child: FluidSlider(
-                                    min: 1.0,
+                                    min: 0.0,
                                     max: 100.0,
                                     start: Text("Age",
                                         style: TextStyle(color: Colors.white)),

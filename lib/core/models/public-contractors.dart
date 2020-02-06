@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:infrastrucktor/core/models/admin-project.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
-import 'package:infrastrucktor/core/viewmodels/add-project.dart';
+import 'package:infrastrucktor/core/viewmodels/profile.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
-class AdminProjects extends StatefulWidget {
-  AdminProjects(
+class PublicContractors extends StatefulWidget {
+  PublicContractors(
       {Key key,
       this.userEmail,
       this.userId,
@@ -24,10 +23,10 @@ class AdminProjects extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
   @override
-  _AdminProjectsState createState() => _AdminProjectsState();
+  _PublicContractorsState createState() => _PublicContractorsState();
 }
 
-class _AdminProjectsState extends State<AdminProjects> {
+class _PublicContractorsState extends State<PublicContractors> {
   TextEditingController _searchCtrl = TextEditingController();
   bool _activeSearch = false;
 
@@ -61,9 +60,9 @@ class _AdminProjectsState extends State<AdminProjects> {
     final _menu = Menu(widget.db, widget.fs, widget.userEmail, widget.userId,
         widget.auth, widget.logoutCallback, context);
     return Scaffold(
-      drawer: Navigator.of(context).canPop() ? null : _menu.contractorDrawer(),
+      drawer: Navigator.of(context).canPop() ? null : _menu.publicDrawer(),
       appBar: AppBar(
-        title: Text("Projects"),
+        title: Text("Contractors"),
         actions: <Widget>[
           _activeSearch
               ? Container(
@@ -86,7 +85,10 @@ class _AdminProjectsState extends State<AdminProjects> {
         child: SingleChildScrollView(
           child: Column(children: <Widget>[
             StreamBuilder(
-              stream: widget.db.collection("projects").snapshots(),
+              stream: widget.db
+                  .collection("accounts")
+                  .where("permission", isEqualTo: 1)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData ||
                     snapshot.connectionState == ConnectionState.waiting) {
@@ -100,8 +102,12 @@ class _AdminProjectsState extends State<AdminProjects> {
                         itemCount: data.length,
                         itemBuilder: (context, i) {
                           if (_searchCtrl.text.isNotEmpty) {
-                            if (data[i]['name'].contains(_searchCtrl.text) ||
-                                data[i]['id'].contains(_searchCtrl.text)) {
+                            if (data[i]['firstname']
+                                    .contains(_searchCtrl.text) ||
+                                data[i]['middlename']
+                                    .contains(_searchCtrl.text) ||
+                                data[i]['lastname']
+                                    .contains(_searchCtrl.text)) {
                               return Container(
                                 height: 100.0,
                                 child: Card(
@@ -112,17 +118,20 @@ class _AdminProjectsState extends State<AdminProjects> {
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  AdminProjectView(
+                                                  AccountProfile(
                                                     auth: widget.auth,
                                                     db: widget.db,
-                                                    document: data[i],
+                                                    fs: widget.fs,
+                                                    logoutCallback:
+                                                        widget.logoutCallback,
                                                     userEmail: widget.userEmail,
                                                     userId: widget.userId,
+                                                    document: data[i],
                                                   )));
                                     },
                                     child: Padding(
                                       padding:
-                                          EdgeInsets.symmetric(vertical: 14.0),
+                                          EdgeInsets.symmetric(vertical: 18.0),
                                       child: ListTile(
                                         leading: Container(
                                           child: Image.asset("assets/logo.png"),
@@ -134,13 +143,14 @@ class _AdminProjectsState extends State<AdminProjects> {
                                           ),
                                         ),
                                         title: Text(
-                                          data[i]["name"],
+                                          data[i]["firstname"] +
+                                              " " +
+                                              data[i]["middlename"] +
+                                              " " +
+                                              data[i]["lastname"],
                                           textScaleFactor: 1.5,
+                                          textAlign: TextAlign.center,
                                         ),
-                                        subtitle: data[i]["id"].isNotEmpty
-                                            ? Text(
-                                                "Project ID: " + data[i]["id"])
-                                            : null,
                                       ),
                                     ),
                                   ),
@@ -158,17 +168,20 @@ class _AdminProjectsState extends State<AdminProjects> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                AdminProjectView(
+                                                AccountProfile(
                                                   auth: widget.auth,
                                                   db: widget.db,
-                                                  document: data[i],
+                                                  fs: widget.fs,
+                                                  logoutCallback:
+                                                      widget.logoutCallback,
                                                   userEmail: widget.userEmail,
                                                   userId: widget.userId,
+                                                  document: data[i],
                                                 )));
                                   },
                                   child: Padding(
                                     padding:
-                                        EdgeInsets.symmetric(vertical: 14.0),
+                                        EdgeInsets.symmetric(vertical: 18.0),
                                     child: ListTile(
                                       leading: Container(
                                         child: Image.asset("assets/logo.png"),
@@ -180,12 +193,14 @@ class _AdminProjectsState extends State<AdminProjects> {
                                         ),
                                       ),
                                       title: Text(
-                                        data[i]["name"],
+                                        data[i]["firstname"] +
+                                            " " +
+                                            data[i]["middlename"] +
+                                            " " +
+                                            data[i]["lastname"],
                                         textScaleFactor: 1.5,
+                                        textAlign: TextAlign.center,
                                       ),
-                                      subtitle: data[i]["id"].isNotEmpty
-                                          ? Text("Project ID: " + data[i]["id"])
-                                          : null,
                                     ),
                                   ),
                                 ),
@@ -206,7 +221,7 @@ class _AdminProjectsState extends State<AdminProjects> {
                             height: 10.0,
                           ),
                           Text(
-                            "There are no registered projects,",
+                            "There are no registered contractors,",
                             textAlign: TextAlign.center,
                             textScaleFactor: 1.1,
                           ),
@@ -214,7 +229,7 @@ class _AdminProjectsState extends State<AdminProjects> {
                             height: 5,
                           ),
                           Text(
-                            "Add a project by pressing the button below",
+                            "Register a contractor by pressing the button below",
                             textAlign: TextAlign.center,
                             textScaleFactor: 1.1,
                           ),

@@ -61,48 +61,62 @@ class _AccountProfileState extends State<AccountProfile> {
                   ? null
                   : data["permission"] == 0
                       ? _menu.adminDrawer()
-                      : _menu.contractorDrawer(),
-              // TODO : Multiple drawer
-              floatingActionButton:
-                  Navigator.of(context).canPop() && data["permission"] == 1
-                      ? FloatingActionButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => UpdateProfile(
-                                      auth: widget.auth,
-                                      db: widget.db,
-                                      document: data,
-                                      fs: widget.fs,
-                                      logoutCallback: widget.logoutCallback,
-                                      userEmail: widget.userEmail,
-                                      userId: widget.userId,
-                                    )));
-                          },
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                          ),
-                        )
-                      : !Navigator.of(context).canPop()
-                          ? FloatingActionButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => UpdateProfile(
-                                          auth: widget.auth,
-                                          db: widget.db,
-                                          document: data,
-                                          fs: widget.fs,
-                                          logoutCallback: widget.logoutCallback,
-                                          userEmail: widget.userEmail,
-                                          userId: widget.userId,
-                                        )));
-                              },
-                              child: Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                              ),
-                            )
-                          : null,
+                      : data["permission"] == 1
+                          ? _menu.contractorDrawer()
+                          : _menu.publicDrawer(),
+              floatingActionButton: StreamBuilder(
+                  stream: widget.db
+                      .collection("accounts")
+                      .where("uid", isEqualTo: widget.userId)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData ||
+                        ConnectionState.waiting == snapshot.connectionState) {
+                      return Container();
+                    }
+                    var _data = snapshot.data.documents[0];
+                    return Navigator.of(context).canPop() &&
+                            _data["permission"] == 0
+                        ? FloatingActionButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => UpdateProfile(
+                                        auth: widget.auth,
+                                        db: widget.db,
+                                        document: data,
+                                        fs: widget.fs,
+                                        logoutCallback: widget.logoutCallback,
+                                        userEmail: widget.userEmail,
+                                        userId: widget.userId,
+                                      )));
+                            },
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                            ),
+                          )
+                        : !Navigator.of(context).canPop()
+                            ? FloatingActionButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => UpdateProfile(
+                                            auth: widget.auth,
+                                            db: widget.db,
+                                            document: data,
+                                            fs: widget.fs,
+                                            logoutCallback:
+                                                widget.logoutCallback,
+                                            userEmail: widget.userEmail,
+                                            userId: widget.userId,
+                                          )));
+                                },
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Container();
+                  }),
               body: CustomScrollView(
                 slivers: <Widget>[
                   SliverAppBar(

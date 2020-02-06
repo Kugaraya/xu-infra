@@ -5,8 +5,8 @@ import 'package:infrastrucktor/core/models/admin-project.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
-class NotifiedProjects extends StatefulWidget {
-  NotifiedProjects(
+class UpdatedProjects extends StatefulWidget {
+  UpdatedProjects(
       {Key key,
       this.userEmail,
       this.userId,
@@ -23,10 +23,10 @@ class NotifiedProjects extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
   @override
-  _NotifiedProjects createState() => _NotifiedProjects();
+  _UpdatedProjects createState() => _UpdatedProjects();
 }
 
-class _NotifiedProjects extends State<NotifiedProjects> {
+class _UpdatedProjects extends State<UpdatedProjects> {
   @override
   Widget build(BuildContext context) {
     final _menu = Menu(widget.db, widget.fs, widget.userEmail, widget.userId,
@@ -109,74 +109,6 @@ class _NotifiedProjects extends State<NotifiedProjects> {
                             height: 25,
                           )
                         : Container(),
-                  ],
-                );
-              },
-            ),
-            StreamBuilder(
-              stream: widget.db
-                  .collection("projects")
-                  .where("deadline", isLessThan: DateTime.now())
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData ||
-                    snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                var data = snapshot.data.documents;
-                return Column(
-                  children: <Widget>[
-                    data.length != 0 ? Text("Delayed Projects") : Container(),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: data.length,
-                        itemBuilder: (context, i) {
-                          return Container(
-                            height: 100.0,
-                            child: Card(
-                              elevation: 5.0,
-                              child: InkWell(
-                                splashColor: Theme.of(context).primaryColor,
-                                onTap: () async {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => AdminProjectView(
-                                            auth: widget.auth,
-                                            db: widget.db,
-                                            document: data[i],
-                                            userEmail: widget.userEmail,
-                                            userId: widget.userId,
-                                          )));
-                                  await widget.db
-                                      .collection("projects")
-                                      .document(data[i].documentID)
-                                      .updateData({"hasUpdate": false});
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 14.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      child: Image.asset("assets/logo.png"),
-                                    ),
-                                    trailing: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.chevron_right,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      data[i]["name"],
-                                      textScaleFactor: 1.5,
-                                    ),
-                                    subtitle: data[i]["id"].isNotEmpty
-                                        ? Text("Project ID: " + data[i]["id"])
-                                        : null,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
                   ],
                 );
               },

@@ -87,6 +87,10 @@ class _ContractorProjects extends State<ContractorProjects> {
               .where("uid", isEqualTo: widget.userId)
               .snapshots(),
           builder: (context, snapshot) {
+            if (!snapshot.hasData ||
+                ConnectionState.waiting == snapshot.connectionState) {
+              return Container();
+            }
             var data = snapshot.data.documents[0];
             return data["permission"] == 1
                 ? FloatingActionButton(

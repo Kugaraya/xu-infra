@@ -55,7 +55,7 @@ class _AuthPageState extends State<AuthPage> {
           if (userId.isNotEmpty) {
             widget.db.collection("accounts").add({
               "age": 0,
-              "contact": 0,
+              "contact": "",
               "email": _email,
               "evaluate": [],
               "feedback": [],
@@ -73,7 +73,6 @@ class _AuthPageState extends State<AuthPage> {
               "suffix": "",
               "uid": userId,
             });
-            print('Signed up user: $userId');
             Fluttertoast.showToast(
                 msg: "Account registration success",
                 textColor: Colors.white,

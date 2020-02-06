@@ -9,8 +9,8 @@ import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class AdminProjectView extends StatefulWidget {
-  AdminProjectView(
+class PublicProjectView extends StatefulWidget {
+  PublicProjectView(
       {Key key, this.db, this.userEmail, this.userId, this.auth, this.document})
       : super(key: key);
 
@@ -21,12 +21,12 @@ class AdminProjectView extends StatefulWidget {
   final BaseAuth auth;
 
   @override
-  _AdminProjectViewState createState() => _AdminProjectViewState();
+  _PublicProjectViewState createState() => _PublicProjectViewState();
 }
 
 const String MIN_DATETIME = '1970-01-01';
 
-class _AdminProjectViewState extends State<AdminProjectView> {
+class _PublicProjectViewState extends State<PublicProjectView> {
   PanelController _panelCtrl = PanelController();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Completer<GoogleMapController> _controller = Completer();
