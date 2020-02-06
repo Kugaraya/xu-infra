@@ -5,6 +5,7 @@ import 'package:infrastrucktor/core/models/admin-contractors.dart';
 import 'package:infrastrucktor/core/models/contractor-projects.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:infrastrucktor/core/viewmodels/profile.dart';
+import 'package:infrastrucktor/ui/views/dashboard.dart';
 import 'package:infrastrucktor/ui/views/main-page.dart';
 import 'package:infrastrucktor/ui/widgets/menuclipper.dart';
 import 'package:flutter/material.dart';
@@ -116,7 +117,17 @@ class Menu {
                           )),
                       _buildDivider(),
                       FlatButton(
-                        onPressed: logoutCallback,
+                        onPressed: () {
+                          auth.signOut();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DashboardScreen(
+                                        auth: Auth(),
+                                        db: Firestore.instance,
+                                        fs: FirebaseStorage.instance,
+                                      )));
+                        },
                         padding: EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(children: [
                           Icon(Icons.exit_to_app, color: Colors.teal[200]),
@@ -247,7 +258,17 @@ class Menu {
                           )),
                       _buildDivider(),
                       FlatButton(
-                        onPressed: logoutCallback,
+                        onPressed: () {
+                          auth.signOut();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DashboardScreen(
+                                        auth: Auth(),
+                                        db: Firestore.instance,
+                                        fs: FirebaseStorage.instance,
+                                      )));
+                        },
                         padding: EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(children: [
                           Icon(Icons.exit_to_app, color: Colors.teal[200]),

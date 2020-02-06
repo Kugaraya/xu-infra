@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:infrastrucktor/core/viewmodels/update-profile.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
@@ -47,6 +47,14 @@ class _AccountProfileState extends State<AccountProfile> {
             return Center(child: CircularProgressIndicator());
           }
           DocumentSnapshot data = snapshot.data.documents[0];
+          double _intRating = 0;
+          double _rating = 0;
+          if (data["feedback"].isNotEmpty) {
+            for (var i = 0; i < data["feedback"].length; i++) {
+              _intRating += data["feedback"][i]["rating"];
+            }
+            _rating = _intRating / data["feedback"].length;
+          }
           return Scaffold(
               key: _scaffoldKey,
               drawer: Navigator.of(context).canPop()
@@ -172,9 +180,10 @@ class _AccountProfileState extends State<AccountProfile> {
                         ),
                         ListTile(
                           leading: Icon(MaterialIcons.phone),
-                          title: Text(data["contact"].toString().isNotEmpty
+                          title: Text(data["contact"].toString().isNotEmpty &&
+                                  data["contact"] != 0
                               ? "+63" + data["contact"].toString()
-                              : ""),
+                              : "+63"),
                         ),
                         ListTile(
                           leading: Icon(MaterialIcons.person),
@@ -187,12 +196,19 @@ class _AccountProfileState extends State<AccountProfile> {
                       ? SliverToBoxAdapter(
                           child: Column(
                             children: <Widget>[
-                              ListTile(
-                                leading: Icon(MaterialIcons.thumbs_up_down),
-                                title: Text(
-                                  "Overall Rating(%): 100",
-                                  style: TextStyle(color: Colors.green),
+                              RatingBar(
+                                initialRating: _rating,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemPadding:
+                                    EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, _) => Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
                                 ),
+                                onRatingUpdate: null,
                               ),
                               SizedBox(
                                 height: 50.0,
@@ -207,58 +223,134 @@ class _AccountProfileState extends State<AccountProfile> {
                                 height: 20,
                                 thickness: 2,
                               ),
-                              ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.blue,
-                                  child: Text("1"),
-                                ),
-                                title: Text(
-                                  "Ongoing",
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                              StreamBuilder(
+                                  stream: widget.db
+                                      .collection("projects")
+                                      .where("completed", isEqualTo: false)
+                                      .where("start",
+                                          isLessThan: DateTime.now())
+                                      .where("contractor",
+                                          isEqualTo: widget.document["uid"])
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    var data = snapshot.data == null
+                                        ? []
+                                        : snapshot.data.documents;
+
+                                    return InkWell(
+                                      onTap: () {},
+                                      splashColor:
+                                          Theme.of(context).primaryColor,
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor: Colors.blue,
+                                          child: Text(data.length.toString()),
+                                        ),
+                                        trailing: Icon(Icons.chevron_right),
+                                        title: Text(
+                                          "Ongoing",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                                  }),
                               Divider(
                                 color: Colors.black45,
                               ),
-                              ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.green,
-                                  child: Text("1"),
-                                ),
-                                title: Text(
-                                  "Finished",
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                              StreamBuilder(
+                                  stream: widget.db
+                                      .collection("projects")
+                                      .where("completed", isEqualTo: true)
+                                      .where("contractor",
+                                          isEqualTo: widget.document["uid"])
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    var data = snapshot.data == null
+                                        ? []
+                                        : snapshot.data.documents;
+
+                                    return InkWell(
+                                      onTap: () {},
+                                      splashColor:
+                                          Theme.of(context).primaryColor,
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor: Colors.green,
+                                          child: Text(data.length.toString()),
+                                        ),
+                                        trailing: Icon(Icons.chevron_right),
+                                        title: Text(
+                                          "Finished",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                                  }),
                               Divider(
                                 color: Colors.black45,
                               ),
-                              ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.yellow,
-                                  child: Text("1"),
-                                ),
-                                title: Text(
-                                  "Delayed",
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                              StreamBuilder(
+                                  stream: widget.db
+                                      .collection("projects")
+                                      .where("completed", isEqualTo: false)
+                                      .where("deadline",
+                                          isLessThan: DateTime.now())
+                                      .where("contractor",
+                                          isEqualTo: widget.document["uid"])
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    var data = snapshot.data == null
+                                        ? []
+                                        : snapshot.data.documents;
+
+                                    return InkWell(
+                                      onTap: () {},
+                                      splashColor:
+                                          Theme.of(context).primaryColor,
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor: Colors.yellow,
+                                          child: Text(data.length.toString()),
+                                        ),
+                                        trailing: Icon(Icons.chevron_right),
+                                        title: Text(
+                                          "Delayed",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                                  }),
                               Divider(
                                 color: Colors.black45,
                               ),
-                              ListTile(
-                                onTap: () {
-                                  Fluttertoast.showToast(msg: "Testing");
-                                },
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.teal,
-                                  child: Text("3"),
-                                ),
-                                title: Text(
-                                  "Total Projects",
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                              StreamBuilder(
+                                  stream: widget.db
+                                      .collection("projects")
+                                      .where("contractor",
+                                          isEqualTo: widget.document["uid"])
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    var data = snapshot.data == null
+                                        ? []
+                                        : snapshot.data.documents;
+
+                                    return InkWell(
+                                      onTap: () {},
+                                      splashColor:
+                                          Theme.of(context).primaryColor,
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor: Colors.teal,
+                                          child: Text(data.length.toString()),
+                                        ),
+                                        trailing: Icon(Icons.chevron_right),
+                                        title: Text(
+                                          "Total Projects",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                                  }),
                               Divider(
                                 color: Colors.black45,
                               ),

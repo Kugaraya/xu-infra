@@ -62,7 +62,12 @@ class _AuthPageState extends State<AuthPage> {
               "firstname": "",
               "lastname": "",
               "middlename": "",
-              "permission": 0,
+              "licensenumber": "",
+              "company": "",
+              "category": "",
+              "classification": "",
+              "region": "",
+              "permission": 2,
               "photo": "",
               "prefix": "",
               "suffix": "",
@@ -71,7 +76,8 @@ class _AuthPageState extends State<AuthPage> {
             print('Signed up user: $userId');
             Fluttertoast.showToast(
                 msg: "Account registration success",
-                backgroundColor: Colors.black38);
+                textColor: Colors.white,
+                backgroundColor: Colors.black54);
           }
         }
         setState(() {

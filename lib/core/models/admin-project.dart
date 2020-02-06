@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:infrastrucktor/core/models/project-update.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class ProjectView extends StatefulWidget {
-  ProjectView(
+class AdminProjectView extends StatefulWidget {
+  AdminProjectView(
       {Key key, this.db, this.userEmail, this.userId, this.auth, this.document})
       : super(key: key);
 
@@ -19,16 +22,31 @@ class ProjectView extends StatefulWidget {
   final BaseAuth auth;
 
   @override
-  _ProjectViewState createState() => _ProjectViewState();
+  _AdminProjectViewState createState() => _AdminProjectViewState();
 }
 
-class _ProjectViewState extends State<ProjectView> {
+const String MIN_DATETIME = '1970-01-01';
+
+class _AdminProjectViewState extends State<AdminProjectView> {
   PanelController _panelCtrl = PanelController();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Completer<GoogleMapController> _controller = Completer();
+  DateTime _projectComplete;
+  String _format = 'yyyy-MMMM-dd';
+  double _rating = 0;
+  var _initRating = 0;
 
   @override
   Widget build(BuildContext context) {
+    if (widget.document["feedback"] != null) {
+      for (var i = 0; i < widget.document["feedback"].length; i++) {
+        _initRating += widget.document["feedback"][i]["rating"];
+      }
+      _rating = _initRating / widget.document["feedback"].length;
+    }
+
+    print("IRate: " + _initRating.toString());
+    print("Rate: " + _rating.toString());
     CameraPosition _kLocation = CameraPosition(
       target: LatLng(widget.document["location"].latitude,
           widget.document["location"].longitude),
@@ -124,6 +142,31 @@ class _ProjectViewState extends State<ProjectView> {
         appBar: AppBar(
           title: Text(widget.document["name"]),
         ),
+        floatingActionButton: StreamBuilder(
+            stream: widget.db
+                .collection("accounts")
+                .where("uid", isEqualTo: widget.userId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              var data = snapshot.data == null
+                  ? {"permission": 2}
+                  : snapshot.data.documents[0];
+              return data["permission"] == 1
+                  ? FloatingActionButton(
+                      child: Icon(Icons.update, color: Colors.white),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ProjectUpdate(
+                                  auth: widget.auth,
+                                  db: widget.db,
+                                  document: widget.document,
+                                  userEmail: widget.userEmail,
+                                  userId: widget.userId,
+                                )));
+                      },
+                    )
+                  : Container();
+            }),
         body: SlidingUpPanel(
           parallaxEnabled: true,
           parallaxOffset: 0.6,
@@ -202,17 +245,107 @@ class _ProjectViewState extends State<ProjectView> {
                 leading: Icon(Icons.calendar_today, size: 32),
                 title: Text("Date Started"),
                 subtitle: Text(formatDate(
-                    (widget.document["schedules"]["start"] as Timestamp)
-                        .toDate(),
+                    (widget.document["start"] as Timestamp).toDate(),
                     [DD, " - ", MM, " ", dd, ", ", yyyy])),
               ),
               ListTile(
-                leading: Icon(Icons.date_range, size: 32),
-                title: Text("Deadline"),
-                subtitle: Text(formatDate(
-                    (widget.document["schedules"]["deadline"] as Timestamp)
-                        .toDate(),
-                    [DD, " - ", MM, " ", dd, ", ", yyyy])),
+                leading: Icon(
+                  Icons.date_range,
+                  size: 32,
+                  color: (widget.document["deadline"] as Timestamp)
+                          .toDate()
+                          .isBefore(DateTime.now())
+                      ? Colors.red
+                      : Colors.grey,
+                ),
+                title: Text(
+                  "Deadline",
+                  style: TextStyle(
+                    color: (widget.document["deadline"] as Timestamp)
+                            .toDate()
+                            .isBefore(DateTime.now())
+                        ? Colors.red
+                        : Colors.grey,
+                  ),
+                ),
+                subtitle: Text(
+                  formatDate(
+                      (widget.document["deadline"] as Timestamp).toDate(),
+                      [DD, " - ", MM, " ", dd, ", ", yyyy]),
+                  style: TextStyle(
+                    color: (widget.document["deadline"] as Timestamp)
+                            .toDate()
+                            .isBefore(DateTime.now())
+                        ? Colors.red
+                        : Colors.grey,
+                  ),
+                ),
+              ),
+              widget.document["completed"] == true
+                  ? ListTile(
+                      leading: Icon(Icons.check,
+                          size: 32,
+                          color: (widget.document["complete"] as Timestamp)
+                                  .toDate()
+                                  .isAfter(
+                                      (widget.document["deadline"] as Timestamp)
+                                          .toDate())
+                              ? Colors.red
+                              : Colors.green),
+                      title: Text(
+                        "Completed",
+                        style: TextStyle(
+                            color: (widget.document["complete"] as Timestamp)
+                                    .toDate()
+                                    .isAfter((widget.document["deadline"]
+                                            as Timestamp)
+                                        .toDate())
+                                ? Colors.red
+                                : Colors.green),
+                      ),
+                      subtitle: Text(
+                        formatDate(
+                            (widget.document["complete"] as Timestamp).toDate(),
+                            [DD, " - ", MM, " ", dd, ", ", yyyy]),
+                        style: TextStyle(
+                            color: (widget.document["complete"] as Timestamp)
+                                    .toDate()
+                                    .isAfter((widget.document["deadline"]
+                                            as Timestamp)
+                                        .toDate())
+                                ? Colors.red
+                                : Colors.green),
+                      ),
+                    )
+                  : Container(),
+              _rating != 0
+                  ? RatingBar(
+                      initialRating: _rating,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      onRatingUpdate: null,
+                    )
+                  : Container(),
+              Divider(),
+              InkWell(
+                splashColor: Theme.of(context).primaryColor,
+                onTap: () {},
+                child: ListTile(
+                  leading: Icon(Icons.mode_edit),
+                  title: Text(
+                    "Comments",
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 1.5,
+                  ),
+                  trailing: Icon(Icons.chevron_right),
+                ),
               ),
             ],
           )),

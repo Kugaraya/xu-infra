@@ -73,6 +73,7 @@ class _AddProjectState extends State<AddProject> {
           widget.db.collection("projects").add({
             "address": _address,
             "budget": _budget,
+            "completed": false,
             "contractor": widget.userId,
             "desc": _projectDescription,
             "feedback": [],
@@ -82,11 +83,9 @@ class _AddProjectState extends State<AddProject> {
                 _pickedLocation.latLng.longitude),
             "name": _projectName,
             "ratings": [],
-            "schedules": {
-              "complete": DateTime.parse(MIN_DATETIME),
-              "deadline": _projectEnd,
-              "start": _projectStart,
-            },
+            "complete": DateTime.parse(MIN_DATETIME),
+            "deadline": _projectEnd,
+            "start": _projectStart,
             "updates": []
           });
           setState(() {
@@ -160,9 +159,7 @@ class _AddProjectState extends State<AddProject> {
               itemHeight: 30.0,
             ),
             onChange: (dateTime, selectedIndex) {
-              setState(() {
-                _projectEnd = dateTime;
-              });
+              _projectEnd = dateTime;
             },
           ),
         ),
@@ -194,9 +191,7 @@ class _AddProjectState extends State<AddProject> {
               itemHeight: 30.0,
             ),
             onChange: (dateTime, selectedIndex) {
-              setState(() {
-                _projectStart = dateTime;
-              });
+              _projectStart = dateTime;
             },
           ),
         ),

@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:infrastrucktor/core/models/contractor-project.dart';
+import 'package:infrastrucktor/core/models/admin-project.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:infrastrucktor/core/viewmodels/add-project.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
-class ContractorProjects extends StatefulWidget {
-  ContractorProjects(
+class AdminProjects extends StatefulWidget {
+  AdminProjects(
       {Key key,
       this.userEmail,
       this.userId,
@@ -24,10 +24,10 @@ class ContractorProjects extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logoutCallback;
   @override
-  _ContractorProjects createState() => _ContractorProjects();
+  _AdminProjectsState createState() => _AdminProjectsState();
 }
 
-class _ContractorProjects extends State<ContractorProjects> {
+class _AdminProjectsState extends State<AdminProjects> {
   TextEditingController _searchCtrl = TextEditingController();
   bool _activeSearch = false;
 
@@ -137,7 +137,7 @@ class _ContractorProjects extends State<ContractorProjects> {
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  ContractorProjectView(
+                                                  AdminProjectView(
                                                     auth: widget.auth,
                                                     db: widget.db,
                                                     document: data[i],
@@ -183,7 +183,7 @@ class _ContractorProjects extends State<ContractorProjects> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                ContractorProjectView(
+                                                AdminProjectView(
                                                   auth: widget.auth,
                                                   db: widget.db,
                                                   document: data[i],

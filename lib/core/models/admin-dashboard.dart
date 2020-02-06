@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:infrastrucktor/core/models/admin-contractors.dart';
+import 'package:infrastrucktor/core/models/admin-projects.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -109,7 +110,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         caption: 'Projects',
                         color: Colors.blue,
                         icon: Icons.search,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AdminProjects(
+                                      auth: widget.auth,
+                                      db: widget.db,
+                                      fs: widget.fs,
+                                      userEmail: widget.userEmail,
+                                      userId: widget.userId,
+                                      logoutCallback: widget.logoutCallback)));
+                        },
                       ),
                     ],
                     secondaryActions: <Widget>[
@@ -144,57 +156,92 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     height: 20,
                     thickness: 2,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    splashColor: Theme.of(context).primaryColor,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.blue,
-                        child: Text("1"),
-                      ),
-                      trailing: Icon(Icons.chevron_right),
-                      title: Text(
-                        "Ongoing",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: widget.db
+                          .collection("projects")
+                          .where("completed", isEqualTo: false)
+                          .where("start", isLessThan: DateTime.now())
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        var data = snapshot.data == null
+                            ? []
+                            : snapshot.data.documents;
+
+                        return InkWell(
+                          onTap: () {},
+                          splashColor: Theme.of(context).primaryColor,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.blue,
+                              child: Text(data.length.toString()),
+                            ),
+                            trailing: Icon(Icons.chevron_right),
+                            title: Text(
+                              "Ongoing",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }),
                   Divider(
                     color: Colors.black45,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    splashColor: Theme.of(context).primaryColor,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.green,
-                        child: Text("1"),
-                      ),
-                      trailing: Icon(Icons.chevron_right),
-                      title: Text(
-                        "Finished",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: widget.db
+                          .collection("projects")
+                          .where("completed", isEqualTo: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        var data = snapshot.data == null
+                            ? []
+                            : snapshot.data.documents;
+
+                        return InkWell(
+                          onTap: () {},
+                          splashColor: Theme.of(context).primaryColor,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.green,
+                              child: Text(data.length.toString()),
+                            ),
+                            trailing: Icon(Icons.chevron_right),
+                            title: Text(
+                              "Finished",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }),
                   Divider(
                     color: Colors.black45,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    splashColor: Theme.of(context).primaryColor,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.yellow,
-                        child: Text("1"),
-                      ),
-                      trailing: Icon(Icons.chevron_right),
-                      title: Text(
-                        "Delayed",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: widget.db
+                          .collection("projects")
+                          .where("completed", isEqualTo: false)
+                          .where("deadline", isLessThan: DateTime.now())
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        var data = snapshot.data == null
+                            ? []
+                            : snapshot.data.documents;
+
+                        return InkWell(
+                          onTap: () {},
+                          splashColor: Theme.of(context).primaryColor,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.yellow,
+                              child: Text(data.length.toString()),
+                            ),
+                            trailing: Icon(Icons.chevron_right),
+                            title: Text(
+                              "Delayed",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }),
                   Divider(
                     color: Colors.black45,
                   ),

@@ -73,13 +73,14 @@ class _ContractorDashboardState extends State<ContractorDashboard> {
                       elevation: 5.0,
                       child: InkWell(
                         onTap: () {
-                          ContractorProjects(
-                            auth: widget.auth,
-                            db: widget.db,
-                            fs: widget.fs,
-                            userEmail: widget.userEmail,
-                            userId: widget.userId,
-                          );
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ContractorProjects(
+                                    auth: widget.auth,
+                                    db: widget.db,
+                                    fs: widget.fs,
+                                    userEmail: widget.userEmail,
+                                    userId: widget.userId,
+                                  )));
                         },
                         splashColor: Theme.of(context).primaryColor,
                         child: Padding(
@@ -114,57 +115,95 @@ class _ContractorDashboardState extends State<ContractorDashboard> {
                     height: 20,
                     thickness: 2,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    splashColor: Theme.of(context).primaryColor,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.blue,
-                        child: Text("1"),
-                      ),
-                      trailing: Icon(Icons.chevron_right),
-                      title: Text(
-                        "Ongoing",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: widget.db
+                          .collection("projects")
+                          .where("completed", isEqualTo: false)
+                          .where("start", isLessThan: DateTime.now())
+                          .where("contractor", isEqualTo: widget.userId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        var data = snapshot.data == null
+                            ? []
+                            : snapshot.data.documents;
+
+                        return InkWell(
+                          onTap: () {},
+                          splashColor: Theme.of(context).primaryColor,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.blue,
+                              child: Text(data.length.toString()),
+                            ),
+                            trailing: Icon(Icons.chevron_right),
+                            title: Text(
+                              "Ongoing",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }),
                   Divider(
                     color: Colors.black45,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    splashColor: Theme.of(context).primaryColor,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.green,
-                        child: Text("1"),
-                      ),
-                      trailing: Icon(Icons.chevron_right),
-                      title: Text(
-                        "Finished",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: widget.db
+                          .collection("projects")
+                          .where("completed", isEqualTo: true)
+                          .where("contractor", isEqualTo: widget.userId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        var data = snapshot.data == null
+                            ? []
+                            : snapshot.data.documents;
+
+                        return InkWell(
+                          onTap: () {},
+                          splashColor: Theme.of(context).primaryColor,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.green,
+                              child: Text(data.length.toString()),
+                            ),
+                            trailing: Icon(Icons.chevron_right),
+                            title: Text(
+                              "Finished",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }),
                   Divider(
                     color: Colors.black45,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    splashColor: Theme.of(context).primaryColor,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.yellow,
-                        child: Text("1"),
-                      ),
-                      trailing: Icon(Icons.chevron_right),
-                      title: Text(
-                        "Delayed",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: widget.db
+                          .collection("projects")
+                          .where("completed", isEqualTo: false)
+                          .where("deadline", isLessThan: DateTime.now())
+                          .where("contractor", isEqualTo: widget.userId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        var data = snapshot.data == null
+                            ? []
+                            : snapshot.data.documents;
+
+                        return InkWell(
+                          onTap: () {},
+                          splashColor: Theme.of(context).primaryColor,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.yellow,
+                              child: Text(data.length.toString()),
+                            ),
+                            trailing: Icon(Icons.chevron_right),
+                            title: Text(
+                              "Delayed",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }),
                   Divider(
                     color: Colors.black45,
                   ),
