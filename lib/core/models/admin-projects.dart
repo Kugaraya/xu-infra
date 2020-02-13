@@ -3,7 +3,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:infrastrucktor/core/models/admin-project.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
-import 'package:infrastrucktor/core/viewmodels/add-project.dart';
 import 'package:infrastrucktor/ui/widgets/menu.dart';
 
 class AdminProjects extends StatefulWidget {
@@ -103,7 +102,8 @@ class _AdminProjectsState extends State<AdminProjects> {
                             if (data[i]['name'].contains(_searchCtrl.text) ||
                                 data[i]['id'].contains(_searchCtrl.text)) {
                               return Container(
-                                height: 100.0,
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                height: 130.0,
                                 child: Card(
                                   elevation: 5.0,
                                   child: InkWell(
@@ -149,7 +149,8 @@ class _AdminProjectsState extends State<AdminProjects> {
                             }
                           } else {
                             return Container(
-                              height: 100.0,
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              height: 130.0,
                               child: Card(
                                 elevation: 5.0,
                                 child: InkWell(

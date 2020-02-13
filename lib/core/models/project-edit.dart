@@ -2,27 +2,29 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
-import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_map_location_picker/google_map_location_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:infrastrucktor/core/services/auth-service.dart';
 
-class AddProject extends StatefulWidget {
-  AddProject({Key key, this.db, this.userEmail, this.userId, this.auth})
+class ProjectEdit extends StatefulWidget {
+  ProjectEdit(
+      {Key key, this.db, this.userEmail, this.userId, this.auth, this.document})
       : super(key: key);
 
+  final DocumentSnapshot document;
   final Firestore db;
   final String userEmail;
   final String userId;
   final BaseAuth auth;
 
   @override
-  _AddProjectState createState() => _AddProjectState();
+  _ProjectEditState createState() => _ProjectEditState();
 }
 
 const String MIN_DATETIME = '1970-01-01';
 
-class _AddProjectState extends State<AddProject> {
+class _ProjectEditState extends State<ProjectEdit> {
   String _format = 'yyyy-MMMM-dd';
 
   final _formKey = GlobalKey<FormState>();
@@ -40,7 +42,18 @@ class _AddProjectState extends State<AddProject> {
   void initState() {
     super.initState();
     _isLoading = false;
-    _pickedLocation = LocationResult(address: "test", latLng: LatLng(0.0, 0.0));
+    _lat = widget.document["location"].latitude.toString();
+    _lng = widget.document["location"].longitude.toString();
+    _budget = widget.document["budget"];
+    _address = widget.document["address"];
+    _projectName = widget.document["name"];
+    _projectID = widget.document["id"];
+    _projectDescription = widget.document["desc"];
+    _projectStart = (widget.document["start"] as Timestamp).toDate();
+    _projectEnd = (widget.document["deadline"] as Timestamp).toDate();
+    _pickedLocation = LocationResult(
+        latLng: LatLng(widget.document["location"].latitude,
+            widget.document["location"].longitude));
   }
 
   @override
@@ -70,23 +83,22 @@ class _AddProjectState extends State<AddProject> {
         });
 
         try {
-          widget.db.collection("projects").add({
+          widget.db
+              .collection("projects")
+              .document(widget.document.documentID)
+              .updateData({
             "address": _address,
             "budget": _budget,
-            "completed": false,
             "contractor": widget.userId,
             "desc": _projectDescription,
-            "feedback": [],
-            "hasUpdate": false,
+            "hasUpdate": true,
             "id": _projectID,
             "location": GeoPoint(_pickedLocation.latLng.latitude,
                 _pickedLocation.latLng.longitude),
             "name": _projectName,
-            "ratings": [],
             "complete": DateTime.parse(MIN_DATETIME),
             "deadline": _projectEnd,
             "start": _projectStart,
-            "updates": []
           });
           setState(() {
             _isLoading = false;
@@ -94,9 +106,10 @@ class _AddProjectState extends State<AddProject> {
 
           _formKey.currentState.reset();
           Fluttertoast.showToast(
-              msg: "Project Added",
+              msg: "Project Updated",
               backgroundColor: Colors.black87,
               textColor: Colors.white);
+          Navigator.of(context).pop();
           Navigator.of(context).pop();
         } catch (e) {
           print('Error: $e');
@@ -127,7 +140,7 @@ class _AddProjectState extends State<AddProject> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0)),
               color: Theme.of(context).primaryColor,
-              child: Text("Add Project",
+              child: Text("Update Project",
                   style: TextStyle(fontSize: 20.0, color: Colors.white)),
               onPressed: validateAndSubmit,
             ),
@@ -141,7 +154,7 @@ class _AddProjectState extends State<AddProject> {
           elevation: 5.0,
           child: DatePickerWidget(
             dateFormat: _format,
-            initialDateTime: DateTime.now(),
+            initialDateTime: _projectEnd,
             minDateTime: DateTime.parse(MIN_DATETIME),
             pickerTheme: DateTimePickerTheme(
               showTitle: true,
@@ -173,7 +186,7 @@ class _AddProjectState extends State<AddProject> {
           elevation: 5.0,
           child: DatePickerWidget(
             dateFormat: _format,
-            initialDateTime: DateTime.now(),
+            initialDateTime: _projectStart,
             minDateTime: DateTime.parse(MIN_DATETIME),
             pickerTheme: DateTimePickerTheme(
               showTitle: true,
@@ -202,6 +215,7 @@ class _AddProjectState extends State<AddProject> {
       return Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 0.0),
         child: TextFormField(
+          initialValue: _budget.toString(),
           maxLines: 1,
           keyboardType: TextInputType.number,
           autofocus: false,
@@ -225,6 +239,7 @@ class _AddProjectState extends State<AddProject> {
       return Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 0.0),
         child: TextFormField(
+          initialValue: _projectDescription,
           maxLines: 3,
           keyboardType: TextInputType.text,
           autofocus: false,
@@ -246,6 +261,7 @@ class _AddProjectState extends State<AddProject> {
       return Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 0.0),
         child: TextFormField(
+          initialValue: _projectName,
           maxLines: 1,
           keyboardType: TextInputType.text,
           autofocus: false,
@@ -267,6 +283,7 @@ class _AddProjectState extends State<AddProject> {
       return Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 0.0),
         child: TextFormField(
+          initialValue: _projectID,
           maxLines: 1,
           keyboardType: TextInputType.text,
           autofocus: false,
@@ -278,6 +295,7 @@ class _AddProjectState extends State<AddProject> {
                 color: Colors.grey,
               )),
           onChanged: (value) => _projectID = value.trim(),
+          onSaved: (value) => _projectID = value.trim(),
         ),
       );
     }
@@ -287,6 +305,7 @@ class _AddProjectState extends State<AddProject> {
         padding: const EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 0.0),
         child: TextFormField(
           maxLines: 1,
+          initialValue: _address,
           keyboardType: TextInputType.text,
           autofocus: false,
           decoration: InputDecoration(
@@ -350,7 +369,7 @@ class _AddProjectState extends State<AddProject> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Add Project'),
+        title: Text('Edit PRoject'),
       ),
       body: Builder(builder: (context) {
         print(_pickedLocation);
@@ -359,23 +378,25 @@ class _AddProjectState extends State<AddProject> {
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
             child: Center(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    projectID(),
-                    projectName(),
-                    projectDescription(),
-                    projectLocation(),
-                    projectBudget(),
-                    projectStart(),
-                    projectDeadline(),
-                    showPrimaryButton()
-                  ],
-                ),
-              ),
+              child: _isLoading
+                  ? CircularProgressIndicator()
+                  : Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          projectID(),
+                          projectName(),
+                          projectDescription(),
+                          projectLocation(),
+                          projectBudget(),
+                          projectStart(),
+                          projectDeadline(),
+                          showPrimaryButton()
+                        ],
+                      ),
+                    ),
             ),
           ),
         );

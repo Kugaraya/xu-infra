@@ -104,7 +104,6 @@ class _ContractorDashboardState extends State<ContractorDashboard> {
                   SizedBox(
                     height: 50.0,
                   ),
-                  // TODO : Project Status
                   Text(
                     "Project Status",
                     textAlign: TextAlign.center,

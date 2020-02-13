@@ -102,7 +102,8 @@ class _PublicProjectsState extends State<PublicProjects> {
                             if (data[i]['name'].contains(_searchCtrl.text) ||
                                 data[i]['id'].contains(_searchCtrl.text)) {
                               return Container(
-                                height: 100.0,
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                height: 130.0,
                                 child: Card(
                                   elevation: 5.0,
                                   child: InkWell(
@@ -148,7 +149,8 @@ class _PublicProjectsState extends State<PublicProjects> {
                             }
                           } else {
                             return Container(
-                              height: 100.0,
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              height: 130.0,
                               child: Card(
                                 elevation: 5.0,
                                 child: InkWell(

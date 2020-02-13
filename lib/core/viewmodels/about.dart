@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 
 class AboutApp extends StatefulWidget {
@@ -38,7 +40,7 @@ class _AboutAppState extends State<AboutApp> {
                     context: context,
                     applicationIcon: Image.asset("assets/logo.png"),
                     applicationName: "Infrastrucktor",
-                    applicationVersion: "1.0b");
+                    applicationVersion: "1.0c");
               },
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 20.0),
@@ -55,7 +57,7 @@ class _AboutAppState extends State<AboutApp> {
                       style: TextStyle(
                         color: Colors.white,
                       )),
-                  subtitle: Text("1.0b",
+                  subtitle: Text("1.0c",
                       style: TextStyle(
                         color: Colors.white,
                       )),
@@ -71,6 +73,16 @@ class _AboutAppState extends State<AboutApp> {
                 if (!snapshot.hasData ||
                     snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
+                }
+
+                DocumentSnapshot data = snapshot.data.documents[0];
+                double _intRating = 0;
+                double _rating = 0;
+                if (data["ratings"].isNotEmpty) {
+                  for (var i = 0; i < data["ratings"].length; i++) {
+                    _intRating += data["ratings"][i]["rating"];
+                  }
+                  _rating = _intRating / data["ratings"].length;
                 }
 
                 return Container(
@@ -94,6 +106,123 @@ class _AboutAppState extends State<AboutApp> {
                             textAlign: TextAlign.start,
                             textScaleFactor: 1.5,
                           ),
+                          SizedBox(
+                            height: 20.0,
+                          ),
+                          StreamBuilder(
+                              stream: widget.db
+                                  .collection("accounts")
+                                  .where("uid", isEqualTo: widget.userId)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData ||
+                                    snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                }
+
+                                DocumentSnapshot data =
+                                    snapshot.data.documents[0];
+
+                                return data["permission"] == 2
+                                    ? RatingBar(
+                                        initialRating: _rating != 0 &&
+                                                !_rating.isNaN &&
+                                                !_rating.isNegative &&
+                                                _rating != null
+                                            ? _rating
+                                            : 0,
+                                        minRating: _rating != 0 &&
+                                                !_rating.isNaN &&
+                                                !_rating.isNegative &&
+                                                _rating != null
+                                            ? 1
+                                            : 0,
+                                        direction: Axis.horizontal,
+                                        allowHalfRating: true,
+                                        itemCount: 5,
+                                        itemPadding: EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        itemBuilder: (context, _) => Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
+                                        onRatingUpdate: (value) {
+                                          showDialog(
+                                              context: context,
+                                              child: AlertDialog(
+                                                content: Text(
+                                                    "Rate this app $value?"),
+                                                actions: <Widget>[
+                                                  FlatButton(
+                                                    color: Colors.blue,
+                                                    child: Text("Confirm"),
+                                                    onPressed: () async {
+                                                      Fluttertoast.showToast(
+                                                          msg:
+                                                              "Thank you for rating our app",
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                          textColor:
+                                                              Colors.white);
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      await widget.db
+                                                          .collection("app")
+                                                          .document(
+                                                              "LwgTDBxMs98hjqxEOqyy")
+                                                          .updateData({
+                                                        "ratings": FieldValue
+                                                            .arrayUnion([
+                                                          {
+                                                            "rating": value,
+                                                            "uid": widget.userId
+                                                          }
+                                                        ]),
+                                                      });
+                                                    },
+                                                  ),
+                                                  FlatButton(
+                                                    color: Colors.red,
+                                                    child: Text("Cancel"),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        value = _rating;
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ));
+                                        },
+                                      )
+                                    : RatingBar(
+                                        initialRating: _rating != 0 &&
+                                                !_rating.isNaN &&
+                                                !_rating.isNegative &&
+                                                _rating != null
+                                            ? _rating
+                                            : 0,
+                                        minRating: _rating != 0 &&
+                                                !_rating.isNaN &&
+                                                !_rating.isNegative &&
+                                                _rating != null
+                                            ? 1
+                                            : 0,
+                                        direction: Axis.horizontal,
+                                        allowHalfRating: true,
+                                        itemCount: 5,
+                                        itemPadding: EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        itemBuilder: (context, _) => Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
+                                        onRatingUpdate: null,
+                                      );
+                              }),
                           SizedBox(
                             height: 20.0,
                           ),

@@ -278,8 +278,16 @@ class _AccountProfileState extends State<UpdateProfile> {
                                                   value: "Dr.",
                                                 ),
                                                 DropdownMenuItem(
+                                                  child: Text("Prof."),
+                                                  value: "Prof.",
+                                                ),
+                                                DropdownMenuItem(
                                                   child: Text("Engr."),
                                                   value: "Engr.",
+                                                ),
+                                                DropdownMenuItem(
+                                                  child: Text("Atty."),
+                                                  value: "Atty.",
                                                 ),
                                               ]
                                             : null,
@@ -310,6 +318,7 @@ class _AccountProfileState extends State<UpdateProfile> {
                                         ? 'First Name can\'t be empty'
                                         : null,
                                     onSaved: (value) => _fname = value.trim(),
+                                    onChanged: (value) => _fname = value.trim(),
                                   ),
                                 ),
                                 Padding(
@@ -332,6 +341,7 @@ class _AccountProfileState extends State<UpdateProfile> {
                                         ? 'Middle Name/Initial can\'t be empty'
                                         : null,
                                     onSaved: (value) => _mname = value.trim(),
+                                    onChanged: (value) => _mname = value.trim(),
                                   ),
                                 ),
                                 Padding(
@@ -354,6 +364,7 @@ class _AccountProfileState extends State<UpdateProfile> {
                                         ? 'Last Name can\'t be empty'
                                         : null,
                                     onSaved: (value) => _lname = value.trim(),
+                                    onChanged: (value) => _lname = value.trim(),
                                   ),
                                 ),
                                 Padding(
@@ -375,6 +386,8 @@ class _AccountProfileState extends State<UpdateProfile> {
                                           color: Colors.transparent,
                                         )),
                                     onSaved: (value) => _suffix = value.trim(),
+                                    onChanged: (value) =>
+                                        _suffix = value.trim(),
                                   ),
                                 ),
                                 Padding(
@@ -397,6 +410,8 @@ class _AccountProfileState extends State<UpdateProfile> {
                                         ? 'Contact number may be invalid'
                                         : null,
                                     onSaved: (value) => _contact = value.trim(),
+                                    onChanged: (value) =>
+                                        _contact = value.trim(),
                                   ),
                                 ),
                                 Padding(

@@ -60,6 +60,13 @@ class _AuthPageState extends State<ManageAdmin> {
             "lastname": _lname,
             "middlename":
                 _mname.length == 1 ? _mname.toUpperCase() + "." : _mname,
+            "licensenumber": "",
+            "company": "",
+            "category": "",
+            "classification": "",
+            "region": "",
+            "pcab": DateTime.now(),
+            "govt": DateTime.now(),
             "permission": 0,
             "photo": "",
             "prefix": _prefix,
@@ -197,6 +204,7 @@ class _AuthPageState extends State<ManageAdmin> {
             )),
         validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
         onSaved: (value) => _email = value.trim(),
+        onChanged: (value) => _email = value.trim(),
       ),
     );
   }
@@ -227,6 +235,7 @@ class _AuthPageState extends State<ManageAdmin> {
             )),
         validator: (value) => value.isEmpty ? 'Password can\'t be empty' : null,
         onSaved: (value) => _password = value.trim(),
+        onChanged: (value) => _password = value.trim(),
       ),
     );
   }
@@ -267,8 +276,16 @@ class _AuthPageState extends State<ManageAdmin> {
                       value: "Dr.",
                     ),
                     DropdownMenuItem(
+                      child: Text("Prof."),
+                      value: "Prof.",
+                    ),
+                    DropdownMenuItem(
                       child: Text("Engr."),
                       value: "Engr.",
+                    ),
+                    DropdownMenuItem(
+                      child: Text("Atty."),
+                      value: "Atty.",
                     ),
                   ]
                 : null,
@@ -297,6 +314,7 @@ class _AuthPageState extends State<ManageAdmin> {
         validator: (value) =>
             value.isEmpty ? 'First Name can\'t be empty' : null,
         onSaved: (value) => _fname = value.trim(),
+        onChanged: (value) => _fname = value.trim(),
       ),
     );
   }
@@ -318,6 +336,7 @@ class _AuthPageState extends State<ManageAdmin> {
         validator: (value) =>
             value.isEmpty ? 'Middle Name/Initial can\'t be empty' : null,
         onSaved: (value) => _mname = value.trim(),
+        onChanged: (value) => _mname = value.trim(),
       ),
     );
   }
@@ -339,6 +358,7 @@ class _AuthPageState extends State<ManageAdmin> {
         validator: (value) =>
             value.isEmpty ? 'Last Name can\'t be empty' : null,
         onSaved: (value) => _lname = value.trim(),
+        onChanged: (value) => _lname = value.trim(),
       ),
     );
   }
@@ -359,6 +379,7 @@ class _AuthPageState extends State<ManageAdmin> {
               color: Colors.transparent,
             )),
         onSaved: (value) => _suffix = value.trim(),
+        onChanged: (value) => _suffix = value.trim(),
       ),
     );
   }
@@ -427,6 +448,7 @@ class _AuthPageState extends State<ManageAdmin> {
         validator: (value) =>
             value.length != 10 ? 'Contact number may be invalid' : null,
         onSaved: (value) => _contact = value.trim(),
+        onChanged: (value) => _contact = value.trim(),
       ),
     );
   }

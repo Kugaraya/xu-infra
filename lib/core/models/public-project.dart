@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:infrastrucktor/core/models/project-update.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:infrastrucktor/core/models/project-comments.dart';
+import 'package:infrastrucktor/core/models/project-updates.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -31,17 +33,21 @@ class _PublicProjectViewState extends State<PublicProjectView> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Completer<GoogleMapController> _controller = Completer();
   double _rating = 0;
-  var _initRating = 0;
+  double _initRating = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.document["ratings"] != null) {
+      for (var i = 0; i < widget.document["ratings"].length; i++) {
+        _initRating += widget.document["ratings"][i]["rating"].toDouble();
+      }
+      _rating = _initRating / widget.document["ratings"].length;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.document["feedback"] != null) {
-      for (var i = 0; i < widget.document["feedback"].length; i++) {
-        _initRating += widget.document["feedback"][i]["rating"];
-      }
-      _rating = _initRating / widget.document["feedback"].length;
-    }
-
     print("IRate: " + _initRating.toString());
     print("Rate: " + _rating.toString());
     CameraPosition _kLocation = CameraPosition(
@@ -139,31 +145,19 @@ class _PublicProjectViewState extends State<PublicProjectView> {
         appBar: AppBar(
           title: Text(widget.document["name"]),
         ),
-        floatingActionButton: StreamBuilder(
-            stream: widget.db
-                .collection("accounts")
-                .where("uid", isEqualTo: widget.userId)
-                .snapshots(),
-            builder: (context, snapshot) {
-              var data = snapshot.data == null
-                  ? {"permission": 2}
-                  : snapshot.data.documents[0];
-              return data["permission"] == 1
-                  ? FloatingActionButton(
-                      child: Icon(Icons.update, color: Colors.white),
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ProjectUpdate(
-                                  auth: widget.auth,
-                                  db: widget.db,
-                                  document: widget.document,
-                                  userEmail: widget.userEmail,
-                                  userId: widget.userId,
-                                )));
-                      },
-                    )
-                  : Container();
-            }),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add_comment, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ProjectComments(
+                      auth: widget.auth,
+                      db: widget.db,
+                      document: widget.document,
+                      userEmail: widget.userEmail,
+                      userId: widget.userId,
+                    )));
+          },
+        ),
         body: SlidingUpPanel(
           parallaxEnabled: true,
           parallaxOffset: 0.6,
@@ -315,29 +309,83 @@ class _PublicProjectViewState extends State<PublicProjectView> {
                       ),
                     )
                   : Container(),
-              _rating != 0
-                  ? RatingBar(
-                      initialRating: _rating,
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      onRatingUpdate: null,
-                    )
-                  : Container(),
+              RatingBar(
+                initialRating: _rating != 0 &&
+                        !_rating.isNaN &&
+                        !_rating.isNegative &&
+                        _rating != null
+                    ? _rating
+                    : 0,
+                minRating: _rating != 0 &&
+                        !_rating.isNaN &&
+                        !_rating.isNegative &&
+                        _rating != null
+                    ? 1
+                    : 0,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (value) {
+                  showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        content: Text("Rate this project $value?"),
+                        actions: <Widget>[
+                          FlatButton(
+                            color: Colors.blue,
+                            child: Text("Confirm"),
+                            onPressed: () async {
+                              Fluttertoast.showToast(
+                                  msg: "Thank you for rating",
+                                  backgroundColor: Colors.green,
+                                  textColor: Colors.white);
+                              Navigator.of(context).pop();
+                              await widget.db
+                                  .collection("projects")
+                                  .document(widget.document.documentID)
+                                  .updateData({
+                                "ratings": FieldValue.arrayUnion([
+                                  {"rating": value, "uid": widget.userId}
+                                ]),
+                              });
+                            },
+                          ),
+                          FlatButton(
+                            color: Colors.red,
+                            child: Text("Cancel"),
+                            onPressed: () {
+                              setState(() {
+                                value = _rating;
+                                Navigator.of(context).pop();
+                              });
+                            },
+                          ),
+                        ],
+                      ));
+                },
+              ),
               Divider(),
               InkWell(
                 splashColor: Theme.of(context).primaryColor,
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ProjectUpdates(
+                            auth: widget.auth,
+                            db: widget.db,
+                            document: widget.document,
+                            userEmail: widget.userEmail,
+                            userId: widget.userId,
+                          )));
+                },
                 child: ListTile(
                   leading: Icon(Icons.mode_edit),
                   title: Text(
-                    "Comments",
+                    "Updates",
                     textAlign: TextAlign.center,
                     textScaleFactor: 1.5,
                   ),

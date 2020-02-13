@@ -5,6 +5,8 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:infrastrucktor/core/models/project-comments.dart';
+import 'package:infrastrucktor/core/models/project-edit.dart';
 import 'package:infrastrucktor/core/models/project-update.dart';
 import 'package:infrastrucktor/core/services/auth-service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -34,17 +36,21 @@ class _ContractorProjectViewState extends State<ContractorProjectView> {
   DateTime _projectComplete;
   String _format = 'yyyy-MMMM-dd';
   double _rating = 0;
-  var _initRating = 0;
+  double _initRating = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.document["ratings"] != null) {
+      for (var i = 0; i < widget.document["ratings"].length; i++) {
+        _initRating += widget.document["ratings"][i]["rating"].toDouble();
+      }
+      _rating = _initRating / widget.document["ratings"].length;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.document["feedback"] != null) {
-      for (var i = 0; i < widget.document["feedback"].length; i++) {
-        _initRating += widget.document["feedback"][i]["rating"];
-      }
-      _rating = _initRating / widget.document["feedback"].length;
-    }
-
     print("IRate: " + _initRating.toString());
     print("Rate: " + _rating.toString());
     CameraPosition _kLocation = CameraPosition(
@@ -141,6 +147,31 @@ class _ContractorProjectViewState extends State<ContractorProjectView> {
         key: _scaffoldKey,
         appBar: AppBar(
           title: Text(widget.document["name"]),
+          actions: widget.document["completed"] == false
+              ? <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ProjectEdit(
+                                auth: widget.auth,
+                                db: widget.db,
+                                document: widget.document,
+                                userEmail: widget.userEmail,
+                                userId: widget.userId,
+                              )));
+                    },
+                    icon: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Colors.white,
+                              style: BorderStyle.solid,
+                              width: 1.66),
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
+                        child: Icon(Icons.edit, color: Colors.white)),
+                  )
+                ]
+              : null,
         ),
         floatingActionButton: StreamBuilder(
             stream: widget.db
@@ -430,7 +461,10 @@ class _ContractorProjectViewState extends State<ContractorProjectView> {
                       ],
                     )
                   : Container(),
-              _rating != 0
+              _rating != 0 &&
+                      !_rating.isNaN &&
+                      !_rating.isNegative &&
+                      _rating != null
                   ? RatingBar(
                       initialRating: _rating,
                       minRating: 1,
@@ -448,7 +482,16 @@ class _ContractorProjectViewState extends State<ContractorProjectView> {
               Divider(),
               InkWell(
                 splashColor: Theme.of(context).primaryColor,
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ProjectComments(
+                            auth: widget.auth,
+                            db: widget.db,
+                            document: widget.document,
+                            userEmail: widget.userEmail,
+                            userId: widget.userId,
+                          )));
+                },
                 child: ListTile(
                   leading: Icon(Icons.mode_edit),
                   title: Text(

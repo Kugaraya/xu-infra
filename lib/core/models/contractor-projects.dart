@@ -132,7 +132,8 @@ class _ContractorProjects extends State<ContractorProjects> {
                             if (data[i]['name'].contains(_searchCtrl.text) ||
                                 data[i]['id'].contains(_searchCtrl.text)) {
                               return Container(
-                                height: 100.0,
+                                height: 130.0,
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
                                 child: Card(
                                   elevation: 5.0,
                                   child: InkWell(
@@ -151,7 +152,7 @@ class _ContractorProjects extends State<ContractorProjects> {
                                     },
                                     child: Padding(
                                       padding:
-                                          EdgeInsets.symmetric(vertical: 14.0),
+                                          EdgeInsets.symmetric(vertical: 18.0),
                                       child: ListTile(
                                         leading: Container(
                                           child: Image.asset("assets/logo.png"),
@@ -178,7 +179,8 @@ class _ContractorProjects extends State<ContractorProjects> {
                             }
                           } else {
                             return Container(
-                              height: 100.0,
+                              height: 130.0,
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: Card(
                                 elevation: 5.0,
                                 child: InkWell(

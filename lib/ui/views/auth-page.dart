@@ -59,6 +59,7 @@ class _AuthPageState extends State<AuthPage> {
               "email": _email,
               "evaluate": [],
               "feedback": [],
+              "gender": "",
               "firstname": "",
               "lastname": "",
               "middlename": "",
@@ -67,6 +68,8 @@ class _AuthPageState extends State<AuthPage> {
               "category": "",
               "classification": "",
               "region": "",
+              "pcab": DateTime.now(),
+              "govt": DateTime.now(),
               "permission": 2,
               "photo": "",
               "prefix": "",
@@ -198,6 +201,7 @@ class _AuthPageState extends State<AuthPage> {
             )),
         validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
         onSaved: (value) => _email = value.trim(),
+        onChanged: (value) => _email = value.trim(),
       ),
     );
   }
@@ -228,6 +232,7 @@ class _AuthPageState extends State<AuthPage> {
             )),
         validator: (value) => value.isEmpty ? 'Password can\'t be empty' : null,
         onSaved: (value) => _password = value.trim(),
+        onChanged: (value) => _password = value.trim(),
       ),
     );
   }
