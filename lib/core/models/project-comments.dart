@@ -73,141 +73,139 @@ class _ProjectCommentsState extends State<ProjectComments> {
         title: Text("Comments"),
         // TODO : View_Comments
       ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Card(
-                elevation: 5.0,
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-                        child: TextFormField(
-                          maxLines: 3,
-                          keyboardType: TextInputType.text,
-                          autofocus: false,
-                          decoration: InputDecoration(
-                              labelText: 'Comment',
-                              icon: Icon(
-                                Icons.insert_comment,
-                                color: Colors.grey,
-                              )),
-                          validator: (value) =>
-                              value.isEmpty ? 'Comment can\'t be empty' : null,
-                          onSaved: (value) => _comment = value.trim(),
-                          onChanged: (value) => _comment = value.trim(),
-                        ),
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          children: <Widget>[
+            Card(
+              elevation: 5.0,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+                      child: TextFormField(
+                        maxLines: 3,
+                        keyboardType: TextInputType.text,
+                        autofocus: false,
+                        decoration: InputDecoration(
+                            labelText: 'Comment',
+                            icon: Icon(
+                              Icons.insert_comment,
+                              color: Colors.grey,
+                            )),
+                        validator: (value) =>
+                            value.isEmpty ? 'Comment can\'t be empty' : null,
+                        onSaved: (value) => _comment = value.trim(),
+                        onChanged: (value) => _comment = value.trim(),
                       ),
-                      FlatButton(
-                        onPressed: validateAndSubmit,
-                        color: Theme.of(context).primaryColor,
-                        textColor: Colors.white,
-                        child: Text("Add Comment"),
-                      )
-                    ],
-                  ),
+                    ),
+                    FlatButton(
+                      onPressed: validateAndSubmit,
+                      color: Theme.of(context).primaryColor,
+                      textColor: Colors.white,
+                      child: Text("Add Comment"),
+                    )
+                  ],
                 ),
               ),
-              StreamBuilder(
-                  stream: widget.db
-                      .collection("projects")
-                      .document(widget.document.documentID)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData ||
-                        snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: Column(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 100,
-                          ),
-                          CircularProgressIndicator(),
-                        ],
-                      ));
-                    }
-
-                    var data = snapshot.data;
-
-                    return Column(
+            ),
+            StreamBuilder(
+                stream: widget.db
+                    .collection("projects")
+                    .document(widget.document.documentID)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData ||
+                      snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: Column(
                       children: <Widget>[
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: data["feedback"].length,
-                          reverse: true,
-                          itemBuilder: (context, index) {
-                            return Card(
-                              color: widget.userId ==
-                                      data["feedback"][index]["uid"]
-                                  ? Colors.yellow[100]
-                                  : Colors.white,
-                              child: ListTile(
-                                leading: Column(
-                                  children: <Widget>[
-                                    CircleAvatar(
-                                      backgroundColor: widget.userId ==
-                                              data["feedback"][index]["uid"]
-                                          ? Colors.blue[200]
-                                          : Theme.of(context).accentColor,
-                                      child: Icon(
-                                        Icons.person,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    StreamBuilder(
-                                        stream: widget.db
-                                            .collection("accounts")
-                                            .where("uid",
-                                                isEqualTo: data["feedback"]
-                                                    [index]["uid"])
-                                            .snapshots(),
-                                        builder: (context, snapshot) {
-                                          if (!snapshot.hasData ||
-                                              snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                            return Center(
-                                                child:
-                                                    CircularProgressIndicator());
-                                          }
-
-                                          var data = snapshot.data.documents[0];
-
-                                          return Text(data["firstname"]);
-                                        }),
-                                  ],
-                                ),
-                                title: Text(data["feedback"][index]["content"]),
-                                subtitle: Text(formatDate(
-                                    (data["feedback"][index]["time"]
-                                            as Timestamp)
-                                        .toDate(),
-                                    [
-                                      hh,
-                                      ":",
-                                      mm,
-                                      " ",
-                                      am,
-                                      " - ",
-                                      MM,
-                                      " ",
-                                      dd,
-                                      ", ",
-                                      yyyy
-                                    ])),
-                              ),
-                            );
-                          },
+                        SizedBox(
+                          height: 100,
                         ),
+                        CircularProgressIndicator(),
                       ],
-                    );
-                  }),
-            ],
-          ),
+                    ));
+                  }
+
+                  var data = snapshot.data;
+
+                  return Column(
+                    children: <Widget>[
+                      ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: data["feedback"].length,
+                        reverse: true,
+                        itemBuilder: (context, index) {
+                          return Card(
+                            color:
+                                widget.userId == data["feedback"][index]["uid"]
+                                    ? Colors.yellow[100]
+                                    : Colors.white,
+                            child: ListTile(
+                              leading: Column(
+                                children: <Widget>[
+                                  CircleAvatar(
+                                    backgroundColor: widget.userId ==
+                                            data["feedback"][index]["uid"]
+                                        ? Colors.blue[200]
+                                        : Theme.of(context).accentColor,
+                                    child: Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  StreamBuilder(
+                                      stream: widget.db
+                                          .collection("accounts")
+                                          .where("uid",
+                                              isEqualTo: data["feedback"][index]
+                                                  ["uid"])
+                                          .snapshots(),
+                                      builder: (context, snapshot) {
+                                        if (!snapshot.hasData ||
+                                            snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                          return Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        }
+
+                                        var data = snapshot.data.documents[0];
+
+                                        return Text(data["firstname"]);
+                                      }),
+                                ],
+                              ),
+                              title: Text(data["feedback"][index]["content"]),
+                              subtitle: Text(formatDate(
+                                  (data["feedback"][index]["time"] as Timestamp)
+                                      .toDate(),
+                                  [
+                                    hh,
+                                    ":",
+                                    mm,
+                                    " ",
+                                    am,
+                                    " - ",
+                                    MM,
+                                    " ",
+                                    dd,
+                                    ", ",
+                                    yyyy
+                                  ])),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                }),
+          ],
         ),
       ),
     );

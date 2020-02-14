@@ -205,305 +205,315 @@ class _ContractorProjectViewState extends State<ContractorProjectView> {
           minHeight: 80.0,
           body: mapLocation(),
           panel: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
               child: Column(
-            children: <Widget>[
-              InkWell(
-                onTap: () {
-                  _panelCtrl.isPanelOpen()
-                      ? _panelCtrl.close()
-                      : _panelCtrl.open();
-                },
-                splashColor: Theme.of(context).primaryColor,
-                child: ListTile(
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
-                  leading: Icon(
-                    Icons.arrow_drop_up,
-                    size: 32.0,
-                  ),
-                  trailing: Icon(
-                    Icons.arrow_drop_up,
-                    size: 32.0,
-                  ),
-                  title: Text(
-                    "Project Details",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textScaleFactor: 1.4,
-                    textAlign: TextAlign.center,
-                  ),
-                  subtitle: Text(
-                    "Tap to open/close",
-                    textScaleFactor: 1.1,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-              Divider(
-                thickness: 1.2,
-              ),
-              contractor(),
-              Divider(
-                thickness: 1.2,
-              ),
-              widget.document["id"].isNotEmpty
-                  ? ListTile(
-                      leading: Icon(Icons.local_library, size: 32),
-                      title: Text("Project ID"),
-                      subtitle: Text(widget.document["id"]),
-                    )
-                  : Container(),
-              ListTile(
-                leading: Icon(Icons.library_books, size: 32),
-                title: Text("Project Name"),
-                subtitle: Text(widget.document["name"]),
-              ),
-              ListTile(
-                leading: Icon(Icons.edit, size: 32),
-                title: Text("Project Description"),
-                subtitle: Text(widget.document["desc"]),
-              ),
-              ListTile(
-                leading: Icon(Icons.location_city, size: 32),
-                title: Text("Project Location"),
-                subtitle: Text(widget.document["address"]),
-              ),
-              ListTile(
-                leading: Icon(Icons.attach_money, size: 32),
-                title: Text("Project Budget"),
-                subtitle: Text("Php " + widget.document["budget"].toString()),
-              ),
-              ListTile(
-                leading: Icon(Icons.calendar_today, size: 32),
-                title: Text("Date Started"),
-                subtitle: Text(formatDate(
-                    (widget.document["start"] as Timestamp).toDate(),
-                    [DD, " - ", MM, " ", dd, ", ", yyyy])),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.date_range,
-                  size: 32,
-                  color: (widget.document["deadline"] as Timestamp)
-                          .toDate()
-                          .isBefore(DateTime.now())
-                      ? Colors.red
-                      : Colors.grey,
-                ),
-                title: Text(
-                  "Deadline",
-                  style: TextStyle(
-                    color: (widget.document["deadline"] as Timestamp)
-                            .toDate()
-                            .isBefore(DateTime.now())
-                        ? Colors.red
-                        : Colors.grey,
-                  ),
-                ),
-                subtitle: Text(
-                  formatDate(
-                      (widget.document["deadline"] as Timestamp).toDate(),
-                      [DD, " - ", MM, " ", dd, ", ", yyyy]),
-                  style: TextStyle(
-                    color: (widget.document["deadline"] as Timestamp)
-                            .toDate()
-                            .isBefore(DateTime.now())
-                        ? Colors.red
-                        : Colors.grey,
-                  ),
-                ),
-              ),
-              widget.document["completed"] == true
-                  ? ListTile(
-                      leading: Icon(Icons.check,
-                          size: 32,
-                          color: (widget.document["complete"] as Timestamp)
-                                  .toDate()
-                                  .isAfter(
-                                      (widget.document["deadline"] as Timestamp)
-                                          .toDate())
-                              ? Colors.red
-                              : Colors.green),
+                children: <Widget>[
+                  InkWell(
+                    onTap: () {
+                      _panelCtrl.isPanelOpen()
+                          ? _panelCtrl.close()
+                          : _panelCtrl.open();
+                    },
+                    splashColor: Theme.of(context).primaryColor,
+                    child: ListTile(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+                      leading: Icon(
+                        Icons.arrow_drop_up,
+                        size: 32.0,
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_drop_up,
+                        size: 32.0,
+                      ),
                       title: Text(
-                        "Completed",
-                        style: TextStyle(
-                            color: (widget.document["complete"] as Timestamp)
-                                    .toDate()
-                                    .isAfter((widget.document["deadline"]
-                                            as Timestamp)
-                                        .toDate())
-                                ? Colors.red
-                                : Colors.green),
+                        "Project Details",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textScaleFactor: 1.4,
+                        textAlign: TextAlign.center,
                       ),
                       subtitle: Text(
-                        formatDate(
-                            (widget.document["complete"] as Timestamp).toDate(),
-                            [DD, " - ", MM, " ", dd, ", ", yyyy]),
-                        style: TextStyle(
-                            color: (widget.document["complete"] as Timestamp)
-                                    .toDate()
-                                    .isAfter((widget.document["deadline"]
-                                            as Timestamp)
-                                        .toDate())
-                                ? Colors.red
-                                : Colors.green),
+                        "Tap to open/close",
+                        textScaleFactor: 1.1,
+                        textAlign: TextAlign.center,
                       ),
-                    )
-                  : Container(),
-              widget.document["completed"] == false
-                  ? Column(
-                      children: <Widget>[
-                        Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 0.0),
-                          child: Card(
-                            elevation: 5.0,
-                            child: DatePickerWidget(
-                              dateFormat: _format,
-                              initialDateTime: DateTime.now(),
-                              minDateTime: DateTime.parse(MIN_DATETIME),
-                              pickerTheme: DateTimePickerTheme(
-                                showTitle: true,
-                                title: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "Date Completed",
-                                  ),
-                                ),
-                                cancel: null,
-                                confirm: null,
-                                itemTextStyle: TextStyle(
-                                    color: Theme.of(context).primaryColor),
-                                pickerHeight: 100.0,
-                                titleHeight: 24.0,
-                                itemHeight: 30.0,
-                              ),
-                              onChange: (dateTime, selectedIndex) {
-                                _projectComplete = dateTime;
-                              },
-                            ),
-                          ),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 15.0),
-                            child: SizedBox(
-                              height: 40.0,
-                              child: RaisedButton(
-                                elevation: 5.0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0)),
-                                color: Theme.of(context).primaryColor,
-                                child: Text("Project Complete",
-                                    style: TextStyle(
-                                        fontSize: 20.0, color: Colors.white)),
-                                onPressed: () {
-                                  if (_projectComplete.isBefore(
-                                      (widget.document["start"] as Timestamp)
-                                          .toDate())) {
-                                    _scaffoldKey.currentState
-                                        .showSnackBar(SnackBar(
-                                      content: Text(
-                                          "Please review date of completion"),
-                                      duration: Duration(seconds: 1),
-                                    ));
-                                  } else {
-                                    showDialog(
-                                        context: context,
-                                        barrierDismissible: true,
-                                        child: AlertDialog(
-                                          elevation: 5.0,
-                                          title: Text("Confirm Date"),
-                                          content: Text(formatDate(
-                                              _projectComplete, [
-                                            DD,
-                                            " - ",
-                                            MM,
-                                            " ",
-                                            dd,
-                                            ", ",
-                                            yyyy
-                                          ])),
-                                          actions: <Widget>[
-                                            FlatButton(
-                                              child: Text("Confirm",
-                                                  style: TextStyle(
-                                                      color: Colors.green)),
-                                              onPressed: () async {
-                                                await widget.db
-                                                    .collection("projects")
-                                                    .document(widget
-                                                        .document.documentID)
-                                                    .updateData({
-                                                  "complete": _projectComplete,
-                                                  "completed": true,
-                                                  "deadline": widget
-                                                      .document["deadline"],
-                                                  "start":
-                                                      widget.document["start"]
-                                                });
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                            FlatButton(
-                                              child: Text("Cancel",
-                                                  style: TextStyle(
-                                                      color: Colors.red)),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
-                                        ));
-                                  }
-                                },
-                              ),
-                            )),
-                      ],
-                    )
-                  : Container(),
-              _rating != 0 &&
-                      !_rating.isNaN &&
-                      !_rating.isNegative &&
-                      _rating != null
-                  ? RatingBar(
-                      initialRating: _rating,
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      onRatingUpdate: null,
-                    )
-                  : Container(),
-              Divider(),
-              InkWell(
-                splashColor: Theme.of(context).primaryColor,
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => ProjectComments(
-                            auth: widget.auth,
-                            db: widget.db,
-                            document: widget.document,
-                            userEmail: widget.userEmail,
-                            userId: widget.userId,
-                          )));
-                },
-                child: ListTile(
-                  leading: Icon(Icons.mode_edit),
-                  title: Text(
-                    "Comments",
-                    textAlign: TextAlign.center,
-                    textScaleFactor: 1.5,
+                    ),
                   ),
-                  trailing: Icon(Icons.chevron_right),
-                ),
-              ),
-            ],
-          )),
+                  Divider(
+                    thickness: 1.2,
+                  ),
+                  contractor(),
+                  Divider(
+                    thickness: 1.2,
+                  ),
+                  widget.document["id"].isNotEmpty
+                      ? ListTile(
+                          leading: Icon(Icons.local_library, size: 32),
+                          title: Text("Project ID"),
+                          subtitle: Text(widget.document["id"]),
+                        )
+                      : Container(),
+                  ListTile(
+                    leading: Icon(Icons.library_books, size: 32),
+                    title: Text("Project Name"),
+                    subtitle: Text(widget.document["name"]),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.edit, size: 32),
+                    title: Text("Project Description"),
+                    subtitle: Text(widget.document["desc"]),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.location_city, size: 32),
+                    title: Text("Project Location"),
+                    subtitle: Text(widget.document["address"]),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.attach_money, size: 32),
+                    title: Text("Project Budget"),
+                    subtitle:
+                        Text("Php " + widget.document["budget"].toString()),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.calendar_today, size: 32),
+                    title: Text("Date Started"),
+                    subtitle: Text(formatDate(
+                        (widget.document["start"] as Timestamp).toDate(),
+                        [DD, " - ", MM, " ", dd, ", ", yyyy])),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.date_range,
+                      size: 32,
+                      color: (widget.document["deadline"] as Timestamp)
+                              .toDate()
+                              .isBefore(DateTime.now())
+                          ? Colors.red
+                          : Colors.grey,
+                    ),
+                    title: Text(
+                      "Deadline",
+                      style: TextStyle(
+                        color: (widget.document["deadline"] as Timestamp)
+                                .toDate()
+                                .isBefore(DateTime.now())
+                            ? Colors.red
+                            : Colors.grey,
+                      ),
+                    ),
+                    subtitle: Text(
+                      formatDate(
+                          (widget.document["deadline"] as Timestamp).toDate(),
+                          [DD, " - ", MM, " ", dd, ", ", yyyy]),
+                      style: TextStyle(
+                        color: (widget.document["deadline"] as Timestamp)
+                                .toDate()
+                                .isBefore(DateTime.now())
+                            ? Colors.red
+                            : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  widget.document["completed"] == true
+                      ? ListTile(
+                          leading: Icon(Icons.check,
+                              size: 32,
+                              color: (widget.document["complete"] as Timestamp)
+                                      .toDate()
+                                      .isAfter((widget.document["deadline"]
+                                              as Timestamp)
+                                          .toDate())
+                                  ? Colors.red
+                                  : Colors.green),
+                          title: Text(
+                            "Completed",
+                            style: TextStyle(
+                                color: (widget.document["complete"]
+                                            as Timestamp)
+                                        .toDate()
+                                        .isAfter((widget.document["deadline"]
+                                                as Timestamp)
+                                            .toDate())
+                                    ? Colors.red
+                                    : Colors.green),
+                          ),
+                          subtitle: Text(
+                            formatDate(
+                                (widget.document["complete"] as Timestamp)
+                                    .toDate(),
+                                [DD, " - ", MM, " ", dd, ", ", yyyy]),
+                            style: TextStyle(
+                                color: (widget.document["complete"]
+                                            as Timestamp)
+                                        .toDate()
+                                        .isAfter((widget.document["deadline"]
+                                                as Timestamp)
+                                            .toDate())
+                                    ? Colors.red
+                                    : Colors.green),
+                          ),
+                        )
+                      : Container(),
+                  widget.document["completed"] == false
+                      ? Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  0.0, 25.0, 0.0, 0.0),
+                              child: Card(
+                                elevation: 5.0,
+                                child: DatePickerWidget(
+                                  dateFormat: _format,
+                                  initialDateTime: DateTime.now(),
+                                  minDateTime: DateTime.parse(MIN_DATETIME),
+                                  pickerTheme: DateTimePickerTheme(
+                                    showTitle: true,
+                                    title: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "Date Completed",
+                                      ),
+                                    ),
+                                    cancel: null,
+                                    confirm: null,
+                                    itemTextStyle: TextStyle(
+                                        color: Theme.of(context).primaryColor),
+                                    pickerHeight: 100.0,
+                                    titleHeight: 24.0,
+                                    itemHeight: 30.0,
+                                  ),
+                                  onChange: (dateTime, selectedIndex) {
+                                    _projectComplete = dateTime;
+                                  },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 15.0),
+                                child: SizedBox(
+                                  height: 40.0,
+                                  child: RaisedButton(
+                                    elevation: 5.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0)),
+                                    color: Theme.of(context).primaryColor,
+                                    child: Text("Project Complete",
+                                        style: TextStyle(
+                                            fontSize: 20.0,
+                                            color: Colors.white)),
+                                    onPressed: () {
+                                      if (_projectComplete.isBefore((widget
+                                              .document["start"] as Timestamp)
+                                          .toDate())) {
+                                        _scaffoldKey.currentState
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                              "Please review date of completion"),
+                                          duration: Duration(seconds: 1),
+                                        ));
+                                      } else {
+                                        showDialog(
+                                            context: context,
+                                            barrierDismissible: true,
+                                            child: AlertDialog(
+                                              elevation: 5.0,
+                                              title: Text("Confirm Date"),
+                                              content: Text(formatDate(
+                                                  _projectComplete, [
+                                                DD,
+                                                " - ",
+                                                MM,
+                                                " ",
+                                                dd,
+                                                ", ",
+                                                yyyy
+                                              ])),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text("Confirm",
+                                                      style: TextStyle(
+                                                          color: Colors.green)),
+                                                  onPressed: () async {
+                                                    await widget.db
+                                                        .collection("projects")
+                                                        .document(widget
+                                                            .document
+                                                            .documentID)
+                                                        .updateData({
+                                                      "complete":
+                                                          _projectComplete,
+                                                      "completed": true,
+                                                      "deadline": widget
+                                                          .document["deadline"],
+                                                      "start": widget
+                                                          .document["start"]
+                                                    });
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                                FlatButton(
+                                                  child: Text("Cancel",
+                                                      style: TextStyle(
+                                                          color: Colors.red)),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ],
+                                            ));
+                                      }
+                                    },
+                                  ),
+                                )),
+                          ],
+                        )
+                      : Container(),
+                  _rating != 0 &&
+                          !_rating.isNaN &&
+                          !_rating.isNegative &&
+                          _rating != null
+                      ? RatingBar(
+                          initialRating: _rating,
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: null,
+                        )
+                      : Container(),
+                  Divider(),
+                  InkWell(
+                    splashColor: Theme.of(context).primaryColor,
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ProjectComments(
+                                auth: widget.auth,
+                                db: widget.db,
+                                document: widget.document,
+                                userEmail: widget.userEmail,
+                                userId: widget.userId,
+                              )));
+                    },
+                    child: ListTile(
+                      leading: Icon(Icons.mode_edit),
+                      title: Text(
+                        "Comments",
+                        textAlign: TextAlign.center,
+                        textScaleFactor: 1.5,
+                      ),
+                      trailing: Icon(Icons.chevron_right),
+                    ),
+                  ),
+                ],
+              )),
         ));
   }
 }

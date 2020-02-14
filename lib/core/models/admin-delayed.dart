@@ -36,153 +36,147 @@ class _NotifiedProjects extends State<NotifiedProjects> {
       appBar: AppBar(
         title: Text("Notifications"),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.0),
-        child: SingleChildScrollView(
-          child: Column(children: <Widget>[
-            StreamBuilder(
-              stream: widget.db
-                  .collection("projects")
-                  .where("hasUpdate", isEqualTo: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData ||
-                    snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(children: <Widget>[
+          StreamBuilder(
+            stream: widget.db
+                .collection("projects")
+                .where("hasUpdate", isEqualTo: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData ||
+                  snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
 
-                var data = snapshot.data.documents;
-                return Column(
-                  children: <Widget>[
-                    data.length != 0 ? Text("Recently Updated") : Container(),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: data.length,
-                        itemBuilder: (context, i) {
-                          return Container(
-                            height: 100.0,
-                            child: Card(
-                              elevation: 5.0,
-                              child: InkWell(
-                                splashColor: Theme.of(context).primaryColor,
-                                onTap: () async {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => AdminProjectView(
-                                            auth: widget.auth,
-                                            db: widget.db,
-                                            document: data[i],
-                                            userEmail: widget.userEmail,
-                                            userId: widget.userId,
-                                          )));
-                                  await widget.db
-                                      .collection("projects")
-                                      .document(data[i].documentID)
-                                      .updateData({"hasUpdate": false});
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 14.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      child: Image.asset("assets/logo.png"),
-                                    ),
-                                    trailing: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.chevron_right,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      data[i]["name"],
-                                      textScaleFactor: 1.5,
-                                    ),
-                                    subtitle: data[i]["id"].isNotEmpty
-                                        ? Text("Project ID: " + data[i]["id"])
-                                        : null,
+              var data = snapshot.data.documents;
+              return Column(
+                children: <Widget>[
+                  data.length != 0 ? Text("Recently Updated") : Container(),
+                  ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: data.length,
+                      itemBuilder: (context, i) {
+                        return Card(
+                          elevation: 5.0,
+                          child: InkWell(
+                            splashColor: Theme.of(context).primaryColor,
+                            onTap: () async {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => AdminProjectView(
+                                        auth: widget.auth,
+                                        db: widget.db,
+                                        document: data[i],
+                                        userEmail: widget.userEmail,
+                                        userId: widget.userId,
+                                      )));
+                              await widget.db
+                                  .collection("projects")
+                                  .document(data[i].documentID)
+                                  .updateData({"hasUpdate": false});
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 14.0),
+                              child: ListTile(
+                                leading: Container(
+                                  child: Image.asset("assets/logo.png"),
+                                ),
+                                trailing: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.chevron_right,
                                   ),
                                 ),
+                                title: Text(
+                                  data[i]["name"],
+                                  textScaleFactor: 1.5,
+                                ),
+                                subtitle: data[i]["id"].isNotEmpty
+                                    ? Text("Project ID: " + data[i]["id"])
+                                    : null,
                               ),
                             ),
-                          );
-                        }),
-                    data.length != 0
-                        ? SizedBox(
-                            height: 25,
-                          )
-                        : Container(),
-                  ],
-                );
-              },
-            ),
-            StreamBuilder(
-              stream: widget.db
-                  .collection("projects")
-                  .where("deadline", isLessThan: DateTime.now())
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData ||
-                    snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+                          ),
+                        );
+                      }),
+                  data.length != 0
+                      ? SizedBox(
+                          height: 25,
+                        )
+                      : Container(),
+                ],
+              );
+            },
+          ),
+          StreamBuilder(
+            stream: widget.db
+                .collection("projects")
+                .where("deadline", isLessThan: DateTime.now())
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData ||
+                  snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
 
-                var data = snapshot.data.documents;
-                return Column(
-                  children: <Widget>[
-                    data.length != 0 ? Text("Delayed Projects") : Container(),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: data.length,
-                        itemBuilder: (context, i) {
-                          return Container(
-                            height: 100.0,
-                            child: Card(
-                              elevation: 5.0,
-                              child: InkWell(
-                                splashColor: Theme.of(context).primaryColor,
-                                onTap: () async {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => AdminProjectView(
-                                            auth: widget.auth,
-                                            db: widget.db,
-                                            document: data[i],
-                                            userEmail: widget.userEmail,
-                                            userId: widget.userId,
-                                          )));
-                                  await widget.db
-                                      .collection("projects")
-                                      .document(data[i].documentID)
-                                      .updateData({"hasUpdate": false});
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 14.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      child: Image.asset("assets/logo.png"),
-                                    ),
-                                    trailing: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.chevron_right,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      data[i]["name"],
-                                      textScaleFactor: 1.5,
-                                    ),
-                                    subtitle: data[i]["id"].isNotEmpty
-                                        ? Text("Project ID: " + data[i]["id"])
-                                        : null,
+              var data = snapshot.data.documents;
+              return Column(
+                children: <Widget>[
+                  data.length != 0 ? Text("Delayed Projects") : Container(),
+                  ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: data.length,
+                      itemBuilder: (context, i) {
+                        return Card(
+                          elevation: 5.0,
+                          child: InkWell(
+                            splashColor: Theme.of(context).primaryColor,
+                            onTap: () async {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => AdminProjectView(
+                                        auth: widget.auth,
+                                        db: widget.db,
+                                        document: data[i],
+                                        userEmail: widget.userEmail,
+                                        userId: widget.userId,
+                                      )));
+                              await widget.db
+                                  .collection("projects")
+                                  .document(data[i].documentID)
+                                  .updateData({"hasUpdate": false});
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 14.0),
+                              child: ListTile(
+                                leading: Container(
+                                  child: Image.asset("assets/logo.png"),
+                                ),
+                                trailing: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.chevron_right,
                                   ),
                                 ),
+                                title: Text(
+                                  data[i]["name"],
+                                  textScaleFactor: 1.5,
+                                ),
+                                subtitle: data[i]["id"].isNotEmpty
+                                    ? Text("Project ID: " + data[i]["id"])
+                                    : null,
                               ),
                             ),
-                          );
-                        }),
-                  ],
-                );
-              },
-            ),
-          ]),
-        ),
+                          ),
+                        );
+                      }),
+                ],
+              );
+            },
+          ),
+        ]),
       ),
     );
   }

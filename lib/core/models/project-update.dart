@@ -84,6 +84,7 @@ class _ProjectUpdateState extends State<ProjectUpdate> {
       key: _scaffoldKey,
       appBar: AppBar(title: Text("Add Project Update")),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Container(
           padding: EdgeInsets.all(8.0),
           child: Center(
@@ -154,6 +155,7 @@ class _ProjectUpdateState extends State<ProjectUpdate> {
                         return Column(
                           children: <Widget>[
                             ListView.builder(
+                              physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: data["updates"].length,
                               reverse: true,

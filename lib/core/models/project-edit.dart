@@ -374,6 +374,7 @@ class _ProjectEditState extends State<ProjectEdit> {
       body: Builder(builder: (context) {
         print(_pickedLocation);
         return SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),

@@ -45,6 +45,7 @@ class _PublicDashboardState extends State<PublicDashboard> {
             DocumentSnapshot data = snapshot.data.documents[0];
 
             return SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
               child: Column(
                 children: <Widget>[
                   ListTile(

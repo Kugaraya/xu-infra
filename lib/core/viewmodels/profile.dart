@@ -595,7 +595,7 @@ class _AccountProfileState extends State<AccountProfile> {
                                                     ProfileComments(
                                                       auth: widget.auth,
                                                       db: widget.db,
-                                                      document: data,
+                                                      document: widget.document,
                                                       fs: widget.fs,
                                                       logoutCallback:
                                                           widget.logoutCallback,
@@ -632,7 +632,7 @@ class _AccountProfileState extends State<AccountProfile> {
                                                     ProfileComment(
                                                       auth: widget.auth,
                                                       db: widget.db,
-                                                      document: data,
+                                                      document: widget.document,
                                                       fs: widget.fs,
                                                       logoutCallback:
                                                           widget.logoutCallback,

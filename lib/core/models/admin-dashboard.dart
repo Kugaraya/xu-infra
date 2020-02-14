@@ -45,6 +45,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             DocumentSnapshot data = snapshot.data.documents[0];
 
             return SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
               child: Column(
                 children: <Widget>[
                   ListTile(
